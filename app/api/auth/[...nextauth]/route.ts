@@ -2,7 +2,7 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import prisma from "@/lib/prisma";
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -13,7 +13,6 @@ export const authOptions: NextAuthOptions = {
 
   callbacks: {
     async session({ session, user }: any) {
-      console.log("session", session, "user", user);
       session.user.name = user.name || null;
       session.user.id = user.id;
       return Promise.resolve(session);
