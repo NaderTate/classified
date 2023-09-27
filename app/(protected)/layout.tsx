@@ -5,7 +5,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     // @ts-ignore
     <ProtectedRoute>
-      <div>
+      <div className=" p-5">
         <Header />
         {children}
       </div>

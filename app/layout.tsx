@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <SessionProv session={session}>
-        <body className={inter.className + " p-5"}>
+        <body className={inter.className}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             {children}
             <Toaster />
