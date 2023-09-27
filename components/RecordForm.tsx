@@ -8,8 +8,19 @@ import { GiCancel } from "react-icons/gi";
 import { Input } from "./ui/input";
 import { TfiReload } from "react-icons/tfi";
 import { Button } from "./ui/button";
-function RecordForm({ record }: { record?: Record }) {
-  const [id, setId] = useState<string | null>(record?.id || null);
+import { addRecord, updateRecord } from "@/app/utils/records";
+import { useSession } from "next-auth/react";
+import { BeatLoader } from "react-spinners";
+import { AiFillEye, AiOutlineCheckCircle } from "react-icons/ai";
+function RecordForm({
+  record,
+  setOpen,
+}: {
+  record?: Record;
+  setOpen: (open: boolean) => void;
+}) {
+  const { data: session }: any = useSession();
+  const id = record?.id;
   const [site, setSite] = useState<string>(record?.site || "");
   const [username, setUsername] = useState<string>(record?.username || "");
   const [email, setEmail] = useState<string>(record?.email || "");
@@ -19,6 +30,8 @@ function RecordForm({ record }: { record?: Record }) {
   const [file, setFile] = useState<File | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
   const [uploading, setUploading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [fetching, setFetching] = useState<boolean>(false);
   function generatePassword(): string {
     setGeneratingPassword(true);
     const length = Math.floor(Math.random() * 10) + 20;
@@ -82,18 +95,21 @@ function RecordForm({ record }: { record?: Record }) {
 
     try {
       let formData = new FormData();
-      formData.append("source", file);
-      formData.append("nsfw", "1");
+      formData.append("file", file);
+      formData.append("upload_preset", "classified");
       setUploading(true);
-      const res = await fetch("/api/lensdump", {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1//dqkyatgoy/image/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
       setUploading(false);
       const data = await res.json();
-      if (data.status == 200) {
-        setImage(data.url);
-      }
+      console.log(data);
+      setImage(data.secure_url);
+      setImageName(data.original_filename);
     } catch (error) {
       console.error(error);
       alert("Sorry! something went wrong.");
@@ -103,27 +119,43 @@ function RecordForm({ record }: { record?: Record }) {
     <div className="space-y-5">
       <div>
         {image ? (
-          <div className="flex flex-col items-center">
-            <Image
-              src={image}
-              alt={imageName || ""}
-              width={100}
-              height={100}
-              className="rounded-md"
-            />
-            <p className="line-clamp-1">{imageName}</p>
+          <div className="flex flex-col items-center ">
+            <div className="relative p-4">
+              <Image
+                src={image}
+                alt={imageName || ""}
+                width={100}
+                height={100}
+                className="rounded-md"
+              />
+
+              <GiCancel
+                onClick={onCancelFile}
+                className="absolute top-0 right-0 cursor-pointer"
+                size={20}
+              />
+            </div>
             <div className="flex gap-5">
-              <button onClick={onCancelFile}>
-                <GiCancel size={20} />
-              </button>
-              <button disabled={uploading} onClick={onUploadFile}>
-                <FiUploadCloud
-                  className={`${
-                    uploading && "animate-pulse cursor-not-allowed"
-                  }`}
-                  size={20}
-                />
-              </button>
+              {image.includes("cloudinary") ? (
+                <div className="flex items-center gap-2">
+                  <AiOutlineCheckCircle size={20} /> <span>Image uploaded</span>
+                </div>
+              ) : (
+                <Button
+                  disabled={uploading}
+                  onClick={onUploadFile}
+                  className="my-2"
+                >
+                  {uploading ? (
+                    <BeatLoader size={10} />
+                  ) : (
+                    <>
+                      <FiUploadCloud size={20} />
+                      <span>Upload</span>
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
           </div>
         ) : (
@@ -139,11 +171,48 @@ function RecordForm({ record }: { record?: Record }) {
           </label>
         )}
       </div>
-      <Input type="text" placeholder="Site name" value={site || ""} />
-      <Input type="text" placeholder="Username" value={username || ""} />
-      <Input type="email" placeholder="Email" value={email || ""} />
+      <Input
+        onChange={(e) => {
+          setSite(e.target.value);
+        }}
+        type="text"
+        placeholder="Site name"
+        defaultValue={site || ""}
+      />
+      <Input
+        onChange={(e) => {
+          setUsername(e.target.value);
+        }}
+        type="text"
+        placeholder="Username"
+        defaultValue={username || ""}
+      />
+      <Input
+        onChange={(e) => {
+          setEmail(e.target.value);
+        }}
+        type="email"
+        placeholder="Email"
+        defaultValue={email || ""}
+      />
       <div className="relative">
-        <Input type="text" placeholder="Password" value={password || ""} />
+        <Input
+          onChange={(e) => {
+            setPassword(e.target.value);
+          }}
+          type={showPassword ? "text" : "password"}
+          placeholder="Password"
+          value={password}
+          defaultValue={password || ""}
+        />
+        <AiFillEye
+          className={`absolute right-10 top-0 bottom-0 m-auto cursor-pointer ${
+            showPassword && "text-blue-500"
+          }`}
+          onClick={() => {
+            setShowPassword(!showPassword);
+          }}
+        />
         <TfiReload
           className={`absolute right-2 top-0 bottom-0 m-auto cursor-pointer ${
             generatingPassword && "animate-spin"
@@ -157,7 +226,45 @@ function RecordForm({ record }: { record?: Record }) {
         </TfiReload>
       </div>
       <div className="flex justify-center">
-        <Button variant="default">{id ? "Update" : "Create"}</Button>
+        <Button
+          disabled={
+            site.length < 1 ||
+            !site ||
+            password.length < 1 ||
+            !password ||
+            fetching
+          }
+          onClick={async () => {
+            setFetching(true);
+            if (id) {
+              await updateRecord(
+                id,
+                site,
+                username,
+                image || "",
+                email,
+                password,
+                session?.user?.id
+              );
+              setOpen(false);
+            } else {
+              await addRecord(
+                site,
+                username,
+                image || "",
+                email,
+                password,
+                session?.user?.id
+              );
+              setOpen(false);
+            }
+            setFetching(false);
+          }}
+          variant={"default"}
+        >
+          {fetching && <BeatLoader size={10} />}
+          {!fetching && (id ? "Update" : "Create")}
+        </Button>
       </div>
     </div>
   );

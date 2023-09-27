@@ -5,8 +5,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     // @ts-ignore
     <ProtectedRoute>
-      <div className=" p-5">
-        <Header />
+      <div className=" px-5">
+        {/* <Header /> */}
         {children}
       </div>
     </ProtectedRoute>

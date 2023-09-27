@@ -4,15 +4,29 @@ import { Button } from "@/components/ui/button";
 import { signOut } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 
-function Header() {
+function Header({
+  showSearch = false,
+  setSearch,
+}: {
+  showSearch?: boolean;
+  setSearch?: (search: string) => void;
+}) {
   return (
     <div>
       <div className="flex justify-between">
-        <div className="flex items-center ">
+        <div className="items-center hidden md:flex">
           <AiFillLock className="w-10 h-10" />
           <h1 className="text-4xl font-bold tracking-wide">Classified</h1>
         </div>
-        <Input className="w-56" placeholder="Search..." />
+        {showSearch && (
+          <Input
+            onChange={(e) => {
+              setSearch?.(e.target.value);
+            }}
+            className="w-56"
+            placeholder="Search..."
+          />
+        )}
 
         <div className="flex items-center gap-3">
           <ModeToggle />

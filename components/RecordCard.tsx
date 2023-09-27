@@ -24,9 +24,11 @@ import Image from "next/image";
 import { Button } from "./ui/button";
 import { DialogClose } from "@radix-ui/react-dialog";
 import RecordForm from "./RecordForm";
+import { deleteRecord } from "@/app/utils/records";
 function RecordCard({ record }: { record: Record }) {
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
+  const [open, setOpen] = useState(false);
   return (
     <div className="border-input border rounded-md p-5 space-y-5">
       <div className="flex items-center gap-5">
@@ -48,12 +50,18 @@ function RecordCard({ record }: { record: Record }) {
             <SlOptions />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <Dialog>
+            <Dialog
+              onOpenChange={(open) => {
+                setOpen(open);
+              }}
+              open={open}
+            >
               <DialogTrigger asChild>
                 <DropdownMenuItem
-                  onSelect={(e: { preventDefault: () => any }) =>
-                    e.preventDefault()
-                  }
+                  onSelect={(e: { preventDefault: () => any }) => {
+                    e.preventDefault();
+                    setOpen(true);
+                  }}
                 >
                   Edit
                 </DropdownMenuItem>
@@ -62,7 +70,12 @@ function RecordCard({ record }: { record: Record }) {
                 <DialogHeader>
                   <DialogTitle>Edit Record</DialogTitle>
                 </DialogHeader>
-                <RecordForm record={record} />
+                <RecordForm
+                  record={record}
+                  setOpen={(open: boolean) => {
+                    setOpen(open);
+                  }}
+                />
               </DialogContent>
             </Dialog>
 
@@ -82,14 +95,17 @@ function RecordCard({ record }: { record: Record }) {
                 </DialogHeader>
                 <div className="flex gap-5">
                   <DialogClose asChild>
-                    <Button variant="destructive" onClick={() => {}}>
+                    <Button
+                      variant="destructive"
+                      onClick={() => {
+                        deleteRecord(record.id);
+                      }}
+                    >
                       Yes
                     </Button>
                   </DialogClose>
                   <DialogClose asChild>
-                    <Button variant="outline" onClick={() => {}}>
-                      No
-                    </Button>
+                    <Button variant="outline">No</Button>
                   </DialogClose>
                 </div>
               </DialogContent>
@@ -144,7 +160,7 @@ function RecordCard({ record }: { record: Record }) {
         </p>
         <div className="flex m-auto mr-0 gap-5">
           <AiFillEye
-            className="cursor-pointer"
+            className={`cursor-pointer ${showPassword && "text-blue-500"}`}
             onClick={() => {
               setShowPassword(!showPassword);
             }}
