@@ -5,7 +5,7 @@ import SessionProv from "@/components/SessionProvider";
 import { ThemeProvider } from "@/components/theme-porvider";
 import { Toaster } from "@/components/ui/toaster";
 
-const inter = Nunito();
+const inter = Nunito({ subsets: ["latin-ext"] });
 
 export const metadata: Metadata = {
   title: "Password Manager",
