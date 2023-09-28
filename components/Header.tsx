@@ -31,6 +31,7 @@ function Header({
         <div className="flex items-center gap-3">
           <ModeToggle />
           <Button
+            className="whitespace-nowrap"
             variant="outline"
             onClick={() => {
               signOut();
