@@ -1,5 +1,4 @@
 import prisma from "@/lib/prisma";
-import New from "@/components/New";
 import RecordsList from "@/components/RecordsList";
 async function page() {
   const records = await prisma.record.findMany({

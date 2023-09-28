@@ -4,6 +4,7 @@ import RecordCard from "./RecordCard";
 import Header from "./Header";
 import New from "./New";
 import { useState } from "react";
+import UpArrow from "./UpArrow";
 
 function RecordsList({ records }: { records: Record[] }) {
   const [search, setSearch] = useState<string>("");
@@ -31,6 +32,7 @@ function RecordsList({ records }: { records: Record[] }) {
           <RecordCard key={record.id} record={record} />
         ))}
       </div>
+      <UpArrow />
     </>
   );
 }
