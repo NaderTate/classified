@@ -12,7 +12,7 @@ function Header({
   setSearch?: (search: string) => void;
 }) {
   return (
-    <div>
+    <div className="fixed top-0 w-[-webkit-fill-available]">
       <div className="flex justify-between">
         <div className="items-center hidden md:flex">
           <AiFillLock className="w-10 h-10" />
