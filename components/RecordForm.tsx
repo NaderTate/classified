@@ -4,7 +4,6 @@ import Image from "next/image";
 import { ChangeEvent, MouseEvent, useState } from "react";
 import { BiImageAdd } from "react-icons/bi";
 import { FiUploadCloud } from "react-icons/fi";
-import { GiCancel } from "react-icons/gi";
 import { Input } from "./ui/input";
 import { TfiReload } from "react-icons/tfi";
 import { Button } from "./ui/button";
@@ -12,6 +11,7 @@ import { addRecord, updateRecord } from "@/app/utils/records";
 import { useSession } from "next-auth/react";
 import { BeatLoader } from "react-spinners";
 import { AiFillEye, AiOutlineCheckCircle } from "react-icons/ai";
+import { RxCross2 } from "react-icons/rx";
 function RecordForm({
   record,
   setOpen,
@@ -129,10 +129,10 @@ function RecordForm({
                 className="rounded-md"
               />
 
-              <GiCancel
+              <RxCross2
                 onClick={onCancelFile}
-                className="absolute top-0 right-0 cursor-pointer"
-                size={20}
+                className="absolute top-0 right-0 cursor-pointer opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+                size={18}
               />
             </div>
             <div className="flex gap-5">
