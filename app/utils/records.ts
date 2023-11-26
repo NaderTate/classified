@@ -1,6 +1,5 @@
 "use server";
 import prisma from "@/lib/prisma";
-import { Record } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export const addRecord = async (

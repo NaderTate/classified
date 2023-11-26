@@ -35,7 +35,7 @@ const Page = () => {
       <section className="">
         <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
           <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
-            <Image
+            <img
               fill
               sizes="(max-width: 1023px) 100vw, 50vw"
               alt="Pattern"

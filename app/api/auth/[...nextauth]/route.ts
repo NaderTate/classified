@@ -13,9 +13,7 @@ const authOptions: NextAuthOptions = {
 
   callbacks: {
     async session({ session, user }: any) {
-      session.user.name = user.name || null;
-      session.user.id = user.id;
-      return Promise.resolve(session);
+      return session;
     },
   },
 

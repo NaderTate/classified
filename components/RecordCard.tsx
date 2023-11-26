@@ -33,7 +33,7 @@ function RecordCard({ record }: { record: Record }) {
     <div className="border-input border rounded-md p-5 space-y-5">
       <div className="flex items-center gap-5">
         {record.icon.length > 0 ? (
-          <Image
+          <img
             src={record.icon}
             alt={record.site}
             width={50}

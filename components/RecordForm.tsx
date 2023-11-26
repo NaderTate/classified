@@ -121,7 +121,7 @@ function RecordForm({
         {image ? (
           <div className="flex flex-col items-center ">
             <div className="relative p-4">
-              <Image
+              <img
                 src={image}
                 alt={imageName || ""}
                 width={100}
