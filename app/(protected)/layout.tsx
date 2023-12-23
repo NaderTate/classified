@@ -1,15 +1,14 @@
-"use client";
-import Header from "@/components/Header";
-import ProtectedRoute from "@/components/ProtectedRoute";
-const Layout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    // @ts-ignore
-    <ProtectedRoute>
-      <div className=" px-5">
-        {/* <Header /> */}
-        {children}
-      </div>
-    </ProtectedRoute>
-  );
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+
+import { authOptions } from "@/lib/authOptions";
+
+const Layout = async ({ children }: { children: React.ReactNode }) => {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    redirect("/login");
+  }
+
+  return <div className="bg-background px-5">{children}</div>;
 };
 export default Layout;

@@ -1,23 +1,11 @@
 "use client";
+
 import { signIn } from "next-auth/react";
-import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import { AiFillLock } from "react-icons/ai";
-const SignInButton = () => {
-  return (
-    <button
-      onClick={() => signIn("google", { callbackUrl: "/" })}
-      className="group relative inline-block overflow-hidden border border-indigo-600 px-8 py-3 focus:outline-none focus:ring"
-    >
-      <span className="absolute inset-y-0 left-0 w-[2px] bg-indigo-600 transition-all group-hover:w-full group-active:bg-indigo-500"></span>
 
-      <span className="relative text-sm font-medium text-indigo-600 transition-colors group-hover:text-white">
-        Sign in with Google
-      </span>
-    </button>
-  );
-};
+import { AiFillLock } from "react-icons/ai";
+
 const Page = () => {
   // get the session from the server side and redirect if user is logged in
   const { data: session, status } = useSession();
@@ -60,7 +48,16 @@ const Page = () => {
               <p className="mt-4 leading-relaxed ">
                 Please use your google account to access the site
               </p>
-              <SignInButton />
+              <button
+                onClick={() => signIn("google", { callbackUrl: "/" })}
+                className="group relative inline-block overflow-hidden border border-indigo-600 px-8 py-3 focus:outline-none focus:ring"
+              >
+                <span className="absolute inset-y-0 left-0 w-[2px] bg-indigo-600 transition-all group-hover:w-full group-active:bg-indigo-500"></span>
+
+                <span className="relative text-sm font-medium text-indigo-600 transition-colors group-hover:text-white">
+                  Sign in with Google
+                </span>
+              </button>
             </div>
           </main>
         </div>
