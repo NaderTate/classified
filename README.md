@@ -1,4 +1,4 @@
-![](https://res.cloudinary.com/dqkyatgoy/image/upload/v1703796721/Frame_26_lhjz9e.png)
+![](https://res.cloudinary.com/dqkyatgoy/image/upload/v1703799736/Frame_26_oazxcs.png)
 
 ## This is probably the simplest, but my favorite project so far.
 
