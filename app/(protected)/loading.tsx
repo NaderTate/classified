@@ -1,9 +1,8 @@
 import Header from "@/components/Header";
 import NewRecord from "@/components/record/NewRecord";
 import RecordCardSkeleton from "@/components/record/RecordCardSkeleton";
-type Props = {};
 
-const loading = (props: Props) => {
+const loading = () => {
   return (
     <>
       <Header showSearch />

@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 
-export const getRecords = async (page: number = 1, search = "") => {
+export const getRecords = async (page = 1, search = "") => {
   const session = await getServerSession(authOptions);
 
   const records = await prisma.record.findMany({

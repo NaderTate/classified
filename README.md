@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+![](https://res.cloudinary.com/dqkyatgoy/image/upload/v1703796721/Frame_26_lhjz9e.png)
 
-## Getting Started
+## This is probably the simplest, but my favorite project so far.
 
-First, run the development server:
+#### Classified is simply a password manager, you can use it to create unique passwords to each website, save your credentials for that website, and copy paste these credentials when needed.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+#### You can save as many website as you want and it's 100% free.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Tech used:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+#### Next.JS 14 server actions, Prisma with MongoDB, NextUI, Shadcn, Tailwind css, and Typescript.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+# Why I built this
 
-## Learn More
+#### I don't like having the same password for all the websites I use, I like creating a unique and complex password for each website.
 
-To learn more about Next.js, take a look at the following resources:
+#### To do that, I'd have to go to a password generation website, generate a complex password, then go to notion and create a new row for that website in a table that I built.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### But the issue that I ran into is that on mobile if I want to copy the password from notion, the keyboard would popup and I'd be risking accidently editing the password.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+#### Also this meant that I'd have to open notion just to get my email/password.
 
-## Deploy on Vercel
+#### So I decided to make my own password manager that let's me generate a complex password, save it and copy it with a click of a button.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### This means that on mobile, I don't have to manually select the password and copy it, I can click the copy icon next to the email/passwrod and it will do the job for me.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+![](https://res.cloudinary.com/dqkyatgoy/image/upload/v1703798834/image_43_anjuec.png)
+
+#### This is not just a "website" for the portfolio, I use this app all the time and all my passwords are stored there.
+
+#### And the best part is, when using another password manager, you are storing your passwords in their database, but here I'm saving everything in MongoDB, wait... that's not safe either 🤡

@@ -35,7 +35,6 @@ function Pagination({ total, queries, currentPage }: Props) {
     <div className="flex justify-center my-5">
       <NUIPagination
         initialPage={currentPage || 1}
-        dir="ltr"
         total={Math.ceil(total / 10)}
         onChange={(e) => {
           setTimeout(() => {
