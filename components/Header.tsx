@@ -1,29 +1,25 @@
 "use client";
-import { ModeToggle } from "./ModeToggle";
+import { ThemeSwitch } from "./ThemeSwitch";
 import { AiFillLock } from "react-icons/ai";
-import { Button } from "@/components/ui/button";
-import { signOut } from "next-auth/react";
 import SearchInput from "./SearchInput";
-function Header({ showSearch = false }: { showSearch?: boolean }) {
+import { UserAvatar } from "./UserAvatar";
+
+type HeaderProps = {
+  showSearchInput?: boolean;
+};
+
+function Header({ showSearchInput = false }: HeaderProps) {
   return (
-    <div className="flex justify-between mt-5">
+    <div className="flex justify-between mt-5 gap-x-2">
       <div className="items-center hidden md:flex">
         <AiFillLock className="w-10 h-10" />
         <h1 className="text-4xl font-bold tracking-wide">Classified</h1>
       </div>
-      {showSearch && <SearchInput />}
+      {showSearchInput && <SearchInput />}
 
-      <div className="flex items-center gap-3">
-        <ModeToggle />
-        <Button
-          className="whitespace-nowrap"
-          variant="outline"
-          onClick={() => {
-            signOut();
-          }}
-        >
-          Log out
-        </Button>
+      <div className="flex items-center gap-3 z-10">
+        <ThemeSwitch />
+        <UserAvatar />
       </div>
     </div>
   );

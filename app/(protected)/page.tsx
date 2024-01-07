@@ -12,7 +12,7 @@ async function page({ searchParams }: Props) {
   const { records, resultsCount, totalCount } = await getRecords(page, search);
 
   return (
-    <div className=" flex flex-col min-h-[95vh]">
+    <div className="flex flex-col min-h-[95vh]">
       <div className="grow">
         <RecordsList records={records} totalRecords={totalCount} />
       </div>

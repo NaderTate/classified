@@ -2,12 +2,11 @@
 
 import { Record } from "@prisma/client";
 
-import { useIsAddingContext } from "../ClientProviders";
-
-import NewRecord from "./NewRecord";
 import Header from "../Header";
 import RecordCard from "./RecordCard";
+import RecordForm from "./RecordForm";
 import RecordCardSkeleton from "./RecordCardSkeleton";
+import { useIsAddingContext } from "../ClientProviders";
 
 type Props = {
   records: Record[];
@@ -19,19 +18,24 @@ function RecordsList({ records, totalRecords }: Props) {
 
   return (
     <>
-      <Header showSearch />
-      <NewRecord />
+      <Header showSearchInput />
+      <RecordForm />
       <h1 className="text-3xl font-bold mt-5">
-        Records{" "}
-        {records.length > 0 && (
-          <span className="text-sm text-gray-500">({totalRecords})</span>
-        )}
+        Records <span className="text-sm text-gray-500">({totalRecords})</span>
       </h1>
       <div className="flex flex-wrap gap-5 mt-5">
         {isAddingRecord && <RecordCardSkeleton />}
-        {records.map((record) => (
-          <RecordCard key={record.id} record={record} />
-        ))}
+        {records.length > 0 ? (
+          records.map((record) => (
+            <RecordCard key={record.id} record={record} />
+          ))
+        ) : (
+          <p className="">
+            No records yet, click the{" "}
+            <span className="border-divider border rounded-md px-1">New</span>{" "}
+            button to add your first record.
+          </p>
+        )}
       </div>
     </>
   );

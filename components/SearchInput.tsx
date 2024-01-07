@@ -32,6 +32,7 @@ const SearchInput = ({}: Props) => {
       value={searchKeywords}
       onValueChange={(e) => {
         setSearchKeywords(e);
+        router.push(`/?search=${e}`);
       }}
       className="w-56"
       classNames={{

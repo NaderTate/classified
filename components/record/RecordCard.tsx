@@ -3,21 +3,21 @@
 import { Record } from "@prisma/client";
 
 import Image from "next/image";
-import { Snippet, Image as NUIImage } from "@nextui-org/react";
+import { Snippet, Image as NUIImage, Button } from "@nextui-org/react";
 
 import {
+  DropdownItem,
+  DropdownTrigger,
+  Dropdown,
   DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import EditRecord from "./EditRecord";
+} from "@nextui-org/react";
 import ConfirmDeleteRecord from "./ConfirmDeleteRecord";
 
 import { SlOptions } from "react-icons/sl";
 import { AiOutlineUser } from "react-icons/ai";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { MdOutlineAlternateEmail } from "react-icons/md";
+import RecordForm from "./RecordForm";
 
 type Props = {
   record: Record;
@@ -41,27 +41,26 @@ function RecordCard({ record }: Props) {
         )}
         <h1 className="font-bold text-xl">{record.site}</h1>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger className="m-auto mr-0">
-            <SlOptions />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem
-              onSelect={(e: { preventDefault: () => any }) => {
-                e.preventDefault();
-              }}
-            >
-              <EditRecord record={record} />
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={(e: { preventDefault: () => any }) =>
-                e.preventDefault()
-              }
-            >
+        <Dropdown placement="bottom-end">
+          <DropdownTrigger className="m-auto mr-0">
+            <Button isIconOnly size="sm" variant="light">
+              <SlOptions />
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu
+            hideSelectedIcon
+            closeOnSelect={false}
+            aria-label="Record actions"
+            variant="flat"
+          >
+            <DropdownItem className="p-0" key="edit">
+              <RecordForm record={record} />
+            </DropdownItem>
+            <DropdownItem className="p-0" key="delete">
               <ConfirmDeleteRecord id={record.id} />
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
       </div>
       <div className="flex items-center gap-5">
         <AiOutlineUser size={25} />
@@ -95,7 +94,7 @@ function RecordCard({ record }: Props) {
             codeString={record.password}
           >
             {record.password.substring(0, 4) +
-              record.password.replace(/./g, "*").substring(4, 30)}
+              record.password.replace(/./g, "*").substring(4, 25)}
           </Snippet>
         ) : (
           <span className="text-sm text-default-500">no password</span>

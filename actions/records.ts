@@ -1,13 +1,11 @@
 "use server";
 
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { auth } from "@/auth";
 
 export const getRecords = async (page = 1, search = "") => {
-  const session = await getServerSession(authOptions);
-
+  const session = await auth();
   const records = await prisma.record.findMany({
     where: {
       userId: session?.user?.id,
@@ -48,7 +46,7 @@ export const addRecord = async (recordData: {
   password: string;
 }) => {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     await prisma.record.create({
       data: {
         ...recordData,
@@ -77,7 +75,7 @@ export const updateRecord = async (
   }
 ) => {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     await prisma.record.update({
       where: { id },
       data: {
