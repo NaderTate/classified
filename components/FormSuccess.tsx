@@ -6,8 +6,13 @@ export const FormSuccess = ({ message }: FormSuccessProps) => {
   return (
     message && (
       <div className="bg-green-400/30 p-2 flex items-center w-full rounded-lg">
-        <FaCircleCheck size={20} className="text-green-600" />
-        <p className=" text-sm ml-1 text-green-700">{message}</p>
+        <FaCircleCheck
+          size={20}
+          className="text-green-600 dark:text-green-300"
+        />
+        <p className=" text-sm ml-1 text-green-700 dark:text-green-300">
+          {message}
+        </p>
       </div>
     )
   );

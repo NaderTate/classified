@@ -17,7 +17,7 @@ import { SlOptions } from "react-icons/sl";
 import { AiOutlineUser } from "react-icons/ai";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { MdOutlineAlternateEmail } from "react-icons/md";
-import RecordForm from "./RecordForm";
+import { RecordForm } from "./RecordForm";
 
 type Props = {
   record: Record;
@@ -31,7 +31,7 @@ function RecordCard({ record }: Props) {
           <NUIImage
             as={Image}
             src={record.icon}
-            alt={record.site}
+            alt={record?.site || "icon"}
             width={50}
             height={50}
             className="rounded-md object-contain"

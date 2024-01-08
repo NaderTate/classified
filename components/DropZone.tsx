@@ -26,19 +26,17 @@ const Dropzone = ({ handleImages, maxFiles }: Props) => {
   });
 
   return (
-    <form>
-      <div {...getRootProps({})}>
-        <input {...getInputProps()} />
-        <div className="flex flex-col items-center justify-center gap-4 text-center cursor-pointer">
-          <MdOutlineFileUpload size={25} />
-          {isDragActive ? (
-            <p>Drop the files here ...</p>
-          ) : (
-            <p>Click to choose a site icon, or drop it here...</p>
-          )}
-        </div>
+    <div {...getRootProps({})}>
+      <input {...getInputProps()} />
+      <div className="flex flex-col items-center justify-center gap-4 text-center cursor-pointer">
+        <MdOutlineFileUpload size={25} />
+        {isDragActive ? (
+          <p>Drop the files here ...</p>
+        ) : (
+          <p>Click to choose a site icon, or drop it here...</p>
+        )}
       </div>
-    </form>
+    </div>
   );
 };
 export default Dropzone;

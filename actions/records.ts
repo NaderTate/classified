@@ -39,11 +39,11 @@ export const getRecords = async (page = 1, search = "") => {
 };
 
 export const addRecord = async (recordData: {
-  site: string;
-  icon: string;
-  username: string;
-  email: string;
-  password: string;
+  site?: string | undefined;
+  icon?: string | undefined;
+  username?: string | undefined;
+  email?: string | undefined;
+  password?: string | undefined;
 }) => {
   try {
     const session = await auth();
@@ -60,18 +60,18 @@ export const addRecord = async (recordData: {
     revalidatePath("/");
     return { success: true };
   } catch (error) {
-    return error;
+    return { error };
   }
 };
 
 export const updateRecord = async (
   id: string,
   recordData: {
-    site: string;
-    icon: string;
-    username: string;
-    email: string;
-    password: string;
+    site?: string | undefined;
+    icon?: string | undefined;
+    username?: string | undefined;
+    email?: string | undefined;
+    password?: string | undefined;
   }
 ) => {
   try {
@@ -90,7 +90,7 @@ export const updateRecord = async (
     revalidatePath("/");
     return { success: true };
   } catch (error) {
-    return error;
+    return { error };
   }
 };
 
@@ -102,6 +102,6 @@ export const deleteRecord = async (id: string) => {
     revalidatePath("/");
     return { success: true };
   } catch (error) {
-    return error;
+    return { error };
   }
 };

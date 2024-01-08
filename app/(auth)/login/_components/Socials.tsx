@@ -3,10 +3,10 @@
 import { signIn } from "next-auth/react";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
+import { Button } from "@nextui-org/react";
 import { useSearchParams } from "next/navigation";
 
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
-import { Button } from "@nextui-org/react";
 
 export const Socials = () => {
   const searchParams = useSearchParams();
@@ -23,7 +23,7 @@ export const Socials = () => {
       <Button
         size="lg"
         className="w-full"
-        variant="bordered"
+        variant="ghost"
         onClick={() => onClick("google")}
       >
         <FcGoogle className="h-5 w-5" />
@@ -31,7 +31,7 @@ export const Socials = () => {
       <Button
         size="lg"
         className="w-full"
-        variant="bordered"
+        variant="ghost"
         onClick={() => onClick("github")}
       >
         <FaGithub className="h-5 w-5" />

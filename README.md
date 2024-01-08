@@ -8,7 +8,7 @@
 
 # Tech used:
 
-#### Next.JS 14 server actions, Prisma with MongoDB, NextUI, Shadcn, Tailwind css, and Typescript.
+#### Next.JS 14 server actions, Prisma with MongoDB, Next-Auth v5, NextUI, Shadcn, Tailwind css, and Typescript.
 
 # Why I built this
 

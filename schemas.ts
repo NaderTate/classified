@@ -81,3 +81,15 @@ export const SettingsSchema = z
       path: ["password"],
     }
   );
+export const RecordSchema = z.object({
+  site: z.string().optional(),
+  icon: z.string().optional(),
+  username: z.string().optional(),
+  email: z
+    .string()
+    .email({
+      message: "Email is required",
+    })
+    .optional(),
+  password: z.string().optional(),
+});

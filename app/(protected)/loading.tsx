@@ -1,5 +1,5 @@
 import Header from "@/components/Header";
-import RecordForm from "@/components/record/RecordForm";
+import { RecordForm } from "@/components/record/RecordForm";
 import RecordCardSkeleton from "@/components/record/RecordCardSkeleton";
 
 const loading = () => {

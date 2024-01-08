@@ -1,9 +1,9 @@
 "use client";
-
+import * as z from "zod";
 import { Record } from "@prisma/client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 import Dropzone from "../DropZone";
 
@@ -25,20 +25,59 @@ import {
   Image as NUIImage,
 } from "@nextui-org/react";
 import { MdOutlineEditNote } from "react-icons/md";
-function RecordForm({ record }: { record?: Record }) {
+import { Controller, useForm } from "react-hook-form";
+import { RecordSchema } from "@/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ErrorMessage } from "@hookform/error-message";
+import { FormSuccess } from "../FormSuccess";
+import { FormError } from "../FormError";
+export const RecordForm = ({ record }: { record?: Record }) => {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  const [showPassword, setShowPassword] = useState<boolean>(true);
+  const [error, setError] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
+  const [isPending, startTransition] = useTransition();
   const {
-    recordData,
-    setRecordData,
     handleUploadImage,
     isUploadingImage,
     generatePassword,
     isGeneratingPassword,
-    onSubmit,
-  } = useHandleRecordData(record);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
-  const [showPassword, setShowPassword] = useState<boolean>(true);
-
+    submit,
+  } = useHandleRecordData();
+  const {
+    reset,
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    getValues,
+    setValue,
+  } = useForm<z.infer<typeof RecordSchema>>({
+    resolver: zodResolver(RecordSchema),
+    defaultValues: {
+      site: record?.site || "",
+      icon: record?.icon || "",
+      email: record?.email || "",
+      username: record?.username || "",
+      password: record?.password || "",
+    },
+  });
+  const onSubmit = (values: z.infer<typeof RecordSchema>) => {
+    setError("");
+    setSuccess("");
+    startTransition(() => {
+      submit(values).then((data) => {
+        if (data?.error) {
+          setError(data.error as string);
+        }
+        if (data?.success) {
+          reset();
+          onOpenChange();
+        }
+      });
+    });
+  };
   return (
     <>
       <Button
@@ -52,30 +91,37 @@ function RecordForm({ record }: { record?: Record }) {
       >
         {record ? "Edit" : "New"}
       </Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        classNames={{
+          wrapper: "z-[9999999999]",
+          backdrop: "z-[9999999999]",
+        }}
+      >
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
                 {record ? "Edit Record" : "New Record"}
               </ModalHeader>
-              <ModalBody>
-                <div className="space-y-5">
-                  {recordData.icon ? (
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <ModalBody>
+                  {getValues("icon") ? (
                     <div className="relative w-fit p-5 border-2 border-divider rounded-md">
                       <RxCross2
                         size={20}
                         className="absolute top-1 right-1 cursor-pointer text-default-500 hover:text-default-700 transition-colors"
                         onClick={() => {
-                          setRecordData({ ...recordData, icon: "" });
+                          reset({ icon: "" });
                         }}
                       />
                       <NUIImage
                         as={Image}
-                        src={recordData.icon}
+                        src={getValues("icon")}
                         width={50}
                         height={50}
-                        alt={recordData.site}
+                        alt={getValues("site")}
                         className="rounded-md"
                       />
                     </div>
@@ -87,49 +133,67 @@ function RecordForm({ record }: { record?: Record }) {
                       />
                     </div>
                   ) : (
-                    <Dropzone handleImages={handleUploadImage} maxFiles={1} />
+                    <Controller
+                      name="icon"
+                      control={control}
+                      render={({ field: { onChange, value } }) => (
+                        <Dropzone
+                          handleImages={async (images: File[]) => {
+                            const res = await handleUploadImage(images);
+                            if (res) {
+                              onChange(res.icon);
+                            }
+                          }}
+                          maxFiles={1}
+                        />
+                      )}
+                    />
                   )}
                   <Input
                     variant="bordered"
                     size="sm"
-                    onValueChange={(e) => {
-                      setRecordData({ ...recordData, site: e });
-                    }}
+                    {...register("site")}
                     label="Site name"
-                    defaultValue={recordData.site || ""}
                   />
                   <Input
                     variant="bordered"
                     size="sm"
-                    onValueChange={(e) => {
-                      setRecordData({ ...recordData, username: e });
-                    }}
+                    {...register("username")}
                     label="Username"
-                    defaultValue={recordData.username || ""}
+                    defaultValue={getValues("username")}
                   />
                   <Input
                     variant="bordered"
                     size="sm"
-                    onValueChange={(e) => {
-                      setRecordData({ ...recordData, email: e });
-                    }}
+                    {...register("email")}
                     type="email"
                     label="Email"
-                    defaultValue={recordData.email || ""}
+                    defaultValue={getValues("email")}
+                  />
+                  <ErrorMessage
+                    errors={errors}
+                    name="email"
+                    render={({ message }) => (
+                      <p className="text-red-500 text-sm text-left w-full">
+                        {message}
+                      </p>
+                    )}
                   />
                   <Input
                     md-maxlength="30"
-                    name="password"
                     ng-model="password"
                     autoComplete="new-password"
                     variant="bordered"
-                    onValueChange={(e) => {
-                      setRecordData({ ...recordData, password: e });
-                    }}
+                    {...register("password")}
                     type={showPassword ? "text" : "password"}
                     label="Password"
-                    value={recordData.password || ""}
-                    defaultValue={recordData.password || ""}
+                    value={getValues("password")}
+                    // defaultValue={getValues("password")}
+                    onChange={(e) => {
+                      setValue("password", e.target.value, {
+                        shouldValidate: true,
+                      });
+                    }}
                     endContent={
                       <div className="flex items-center gap-4 m-auto">
                         <AiFillEye
@@ -148,28 +212,33 @@ function RecordForm({ record }: { record?: Record }) {
                           }`}
                           title="Generate Password"
                           onClick={() => {
-                            generatePassword();
+                            setValue("password", generatePassword());
                           }}
                         />
                       </div>
                     }
                   />
-                </div>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" onPress={onClose}>
-                  Cancel
-                </Button>
-                <Button color="primary" type="submit">
-                  {record ? "Update" : "Create"}
-                </Button>
-              </ModalFooter>
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="danger" onPress={onClose}>
+                    Cancel
+                  </Button>
+                  <Button
+                    isLoading={isPending}
+                    isDisabled={isPending}
+                    color="primary"
+                    type="submit"
+                  >
+                    {record ? "Update" : "Create"}
+                  </Button>
+                </ModalFooter>
+                <FormSuccess message={success} />
+                <FormError error={error} />
+              </form>
             </>
           )}
         </ModalContent>
       </Modal>
     </>
   );
-}
-
-export default RecordForm;
+};

@@ -1,7 +1,5 @@
 "use client";
-import * as z from "zod";
 
-import { useState, useTransition } from "react";
 import {
   Modal,
   ModalContent,
@@ -15,14 +13,19 @@ import {
   cn,
   Divider,
 } from "@nextui-org/react";
+import { z } from "zod";
 import { useSession } from "next-auth/react";
-import { SettingsSchema } from "@/schemas";
+import { useState, useTransition } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { updateSettings } from "@/actions/updateSettings";
-import { FormSuccess } from "./FormSuccess";
-import { FormError } from "./FormError";
 import { ErrorMessage } from "@hookform/error-message";
+
+import { FormError } from "./FormError";
+import { FormSuccess } from "./FormSuccess";
+
+import { SettingsSchema } from "@/schemas";
+import { updateSettings } from "@/actions/updateSettings";
+
 export default function Settings() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const session = useSession();
@@ -69,7 +72,14 @@ export default function Settings() {
       <button className="w-full text-left" onClick={onOpen}>
         Settings
       </button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        classNames={{
+          wrapper: "z-[9999999999]",
+          backdrop: "z-[9999999999]",
+        }}
+      >
         <ModalContent>
           {(onClose) => (
             <>

@@ -4,9 +4,7 @@ import { Record } from "@prisma/client";
 
 import Header from "../Header";
 import RecordCard from "./RecordCard";
-import RecordForm from "./RecordForm";
-import RecordCardSkeleton from "./RecordCardSkeleton";
-import { useIsAddingContext } from "../ClientProviders";
+import { RecordForm } from "./RecordForm";
 
 type Props = {
   records: Record[];
@@ -14,8 +12,6 @@ type Props = {
 };
 
 function RecordsList({ records, totalRecords }: Props) {
-  const { isAddingRecord } = useIsAddingContext();
-
   return (
     <>
       <Header showSearchInput />
@@ -24,7 +20,6 @@ function RecordsList({ records, totalRecords }: Props) {
         Records <span className="text-sm text-gray-500">({totalRecords})</span>
       </h1>
       <div className="flex flex-wrap gap-5 mt-5">
-        {isAddingRecord && <RecordCardSkeleton />}
         {records.length > 0 ? (
           records.map((record) => (
             <RecordCard key={record.id} record={record} />

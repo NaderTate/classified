@@ -1,23 +1,14 @@
 "use client";
 
+import { z } from "zod";
 import { useState } from "react";
 
 import { Record } from "@prisma/client";
 
+import { RecordSchema } from "@/schemas";
 import { addRecord, updateRecord } from "@/actions/records";
 
-import { useIsAddingContext } from "@/components/ClientProviders";
-
 export const useHandleRecordData = (record?: Record) => {
-  const { setIsAddingRecord } = useIsAddingContext();
-  const [recordData, setRecordData] = useState({
-    site: record?.site || "",
-    icon: record?.icon || "",
-    username: record?.username || "",
-    email: record?.email || "",
-    password: record?.password || "",
-  });
-
   const [isUploadingImage, setUploadingImage] = useState(false);
 
   const [isGeneratingPassword, setGeneratingPassword] = useState(false);
@@ -33,20 +24,13 @@ export const useHandleRecordData = (record?: Record) => {
     const formData = new FormData();
     formData.append("file", image);
     formData.append("upload_preset", "classified");
-    await fetch("/api/cloudinary", {
+    const req = await fetch("/api/cloudinary", {
       method: "POST",
       body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setRecordData({ ...recordData, icon: data.Image });
-      })
-      .catch((error) => {
-        alert("error uploading images");
-        console.error(error);
-      });
-
+    });
+    const res = await req.json();
     setUploadingImage(false);
+    return { icon: res.Image as string };
   };
 
   function generatePassword() {
@@ -59,29 +43,27 @@ export const useHandleRecordData = (record?: Record) => {
       password += charset.charAt(Math.floor(Math.random() * n));
     }
 
-    setRecordData({ ...recordData, password });
     setTimeout(() => {
       setGeneratingPassword(false);
     }, 500);
+    return password;
   }
 
-  const onSubmit = async () => {
+  const submit = async (values: z.infer<typeof RecordSchema>) => {
     if (record) {
-      await updateRecord(record.id, recordData);
+      const res = await updateRecord(record.id, values);
+      return res;
     } else {
-      setIsAddingRecord(true);
-      await addRecord(recordData);
-      setIsAddingRecord(false);
+      const res = await addRecord(values);
+      return res;
     }
   };
 
   return {
-    recordData,
-    setRecordData,
     handleUploadImage,
     isUploadingImage,
     generatePassword,
     isGeneratingPassword,
-    onSubmit,
+    submit,
   };
 };
