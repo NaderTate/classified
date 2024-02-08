@@ -13,7 +13,7 @@ model User {
   email                 String                 @unique
   image                 String?
   password              String?
-  emailVerified         DateTime?              @map("verifiedAt")
+  emailVerified         DateTime?              @default(now())
   records               Record[]
   isTwoFactorEnabled    Boolean                @default(false)
   twoFactorConfirmation TwoFactorConfirmation?

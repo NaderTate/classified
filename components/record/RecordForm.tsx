@@ -44,7 +44,7 @@ export const RecordForm = ({ record }: { record?: Record }) => {
     generatePassword,
     isGeneratingPassword,
     submit,
-  } = useHandleRecordData();
+  } = useHandleRecordData(record);
   const {
     reset,
     register,
@@ -150,6 +150,7 @@ export const RecordForm = ({ record }: { record?: Record }) => {
                     />
                   )}
                   <Input
+                    defaultValue={getValues("site")}
                     variant="bordered"
                     size="sm"
                     {...register("site")}
