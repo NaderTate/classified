@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "Classified",
+    "slug": "classified",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "classified",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.classified.app"
+    },
+    "android": {
+      "package": "com.classified.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#000000"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-haptics"
+    ]
+  }
+}
