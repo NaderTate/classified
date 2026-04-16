@@ -1,7 +1,8 @@
-import { View, Alert, ScrollView } from "react-native";
-import { BottomSheet, Button, Input, TextField, Label, useToast } from "heroui-native";
-import { useState, useEffect } from "react";
+import { View, Alert, Pressable, Image } from "react-native";
+import { BottomSheet, Button, Input, InputGroup, useToast } from "heroui-native";
+import { useState, useEffect, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import { useCreateRecord, useUpdateRecord } from "@/hooks/use-records";
 import type { Record as RecordType } from "@classified/shared";
 
@@ -26,6 +27,7 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
   const [password, setPassword] = useState("");
   const [icon, setIcon] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
   const createRecord = useCreateRecord();
@@ -48,6 +50,43 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
     }
     setShowPassword(false);
   }, [record, isOpen]);
+
+  const handlePickImage = useCallback(async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (result.canceled || !result.assets?.[0]) return;
+
+    setIsUploading(true);
+    try {
+      const asset = result.assets[0];
+      const formData = new FormData();
+      formData.append("file", {
+        uri: asset.uri,
+        type: asset.mimeType || "image/jpeg",
+        name: "icon.jpg",
+      } as unknown as Blob);
+      formData.append("upload_preset", "classified");
+
+      const res = await fetch("https://api.cloudinary.com/v1_1/dqkyatgoy/image/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json();
+      setIcon(data.secure_url || data.url);
+      toast.show({ variant: "success", label: "Image uploaded" });
+    } catch {
+      toast.show({ variant: "danger", label: "Upload failed" });
+    } finally {
+      setIsUploading(false);
+    }
+  }, [toast]);
 
   const handleSave = async () => {
     const data = {
@@ -78,78 +117,63 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
     <BottomSheet isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
       <BottomSheet.Portal>
         <BottomSheet.Overlay />
-        <BottomSheet.Content snapPoints={["90%"]}>
-          <View style={{ paddingHorizontal: 20, paddingBottom: 40, flex: 1 }}>
+        <BottomSheet.Content snapPoints={["70%"]}>
+          <View style={{ paddingHorizontal: 20, paddingBottom: 32, flex: 1 }}>
             {/* Header */}
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <BottomSheet.Title>{isEditing ? "Edit Record" : "New Record"}</BottomSheet.Title>
               <BottomSheet.Close />
             </View>
 
-            {/* Form */}
-            <ScrollView
-              style={{ flex: 1 }}
-              contentContainerStyle={{ gap: 16 }}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
+            {/* Icon picker */}
+            <Pressable
+              onPress={handlePickImage}
+              style={{
+                alignSelf: "center",
+                marginBottom: 16,
+                width: 64,
+                height: 64,
+                borderRadius: 12,
+                backgroundColor: "#27272a",
+                justifyContent: "center",
+                alignItems: "center",
+                overflow: "hidden",
+              }}
             >
-              <TextField>
-                <Label>Site / Service</Label>
-                <Input placeholder="e.g. GitHub" value={site} onChangeText={setSite} />
-              </TextField>
+              {icon ? (
+                <Image source={{ uri: icon }} style={{ width: 64, height: 64, borderRadius: 12 }} />
+              ) : isUploading ? (
+                <Ionicons name="cloud-upload" size={24} color="#3b82f6" />
+              ) : (
+                <Ionicons name="camera" size={24} color="#71717a" />
+              )}
+            </Pressable>
 
-              <TextField>
-                <Label>Username</Label>
-                <Input placeholder="Username" value={username} onChangeText={setUsername} />
-              </TextField>
-
-              <TextField>
-                <Label>Email</Label>
-                <Input
-                  placeholder="Email"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </TextField>
-
-              <TextField>
-                <Label>Password</Label>
-                <Input
+            {/* Compact form */}
+            <View style={{ gap: 10, flex: 1 }}>
+              <Input variant="secondary" placeholder="Site / Service" value={site} onChangeText={setSite} />
+              <Input variant="secondary" placeholder="Username" value={username} onChangeText={setUsername} />
+              <Input variant="secondary" placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+              <InputGroup>
+                <InputGroup.Input
+                  variant="secondary"
                   placeholder="Password"
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
                 />
-              </TextField>
+                <InputGroup.Suffix style={{ gap: 8, flexDirection: "row", alignItems: "center", paddingRight: 8 }}>
+                  <Pressable onPress={() => setShowPassword(!showPassword)}>
+                    <Ionicons name={showPassword ? "eye" : "eye-off"} size={18} color={showPassword ? "#3b82f6" : "#71717a"} />
+                  </Pressable>
+                  <Pressable onPress={() => { setPassword(generatePassword()); setShowPassword(true); }}>
+                    <Ionicons name="refresh" size={18} color="#71717a" />
+                  </Pressable>
+                </InputGroup.Suffix>
+              </InputGroup>
+            </View>
 
-              {/* Password actions */}
-              <View style={{ flexDirection: "row", gap: 12 }}>
-                <Button size="sm" variant="ghost" onPress={() => setShowPassword(!showPassword)}>
-                  <Ionicons name={showPassword ? "eye" : "eye-off"} size={16} color="#a1a1aa" />
-                  <Button.Label>{showPassword ? "Hide" : "Show"}</Button.Label>
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onPress={() => {
-                    setPassword(generatePassword());
-                    setShowPassword(true);
-                  }}
-                >
-                  <Ionicons name="refresh" size={16} color="#a1a1aa" />
-                  <Button.Label>Generate</Button.Label>
-                </Button>
-              </View>
-
-              <TextField>
-                <Label>Icon URL (optional)</Label>
-                <Input placeholder="https://..." value={icon} onChangeText={setIcon} />
-              </TextField>
-            </ScrollView>
-
-            {/* Footer buttons */}
+            {/* Footer */}
             <View style={{ flexDirection: "row", gap: 12, marginTop: 16 }}>
               <View style={{ flex: 1 }}>
                 <Button variant="outline" onPress={onClose}>
