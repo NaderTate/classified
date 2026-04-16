@@ -206,7 +206,7 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
                     autoComplete="new-password"
                     placeholder="Password"
                   />
-                  <InputGroup.Suffix>
+                  <InputGroup.Suffix className="flex gap-2 border-none bg-transparent">
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
