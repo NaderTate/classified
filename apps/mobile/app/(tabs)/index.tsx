@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useCallback } from "react";
 import { View, FlatList, Text, RefreshControl } from "react-native";
 import { SearchField, Button, Skeleton } from "heroui-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -9,6 +9,9 @@ import ConfirmDelete from "@/components/confirm-delete";
 import type { Record as RecordType } from "@classified/shared";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+// Memoize to prevent re-render when modal state changes
+const MemoRecordCard = React.memo(RecordCard);
+
 export default function RecordsScreen() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -18,19 +21,28 @@ export default function RecordsScreen() {
   const [showCreate, setShowCreate] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
-  const queryParams = useMemo(() => ({ page, search: debouncedSearch, limit: 50 }), [page, debouncedSearch]);
+  const queryParams = useMemo(() => ({ page, search: debouncedSearch, limit: 20 }), [page, debouncedSearch]);
   const { data, isLoading, refetch, isRefetching } = useRecords(queryParams);
 
-  const handleSearch = (value: string) => {
+  const handleSearch = useCallback((value: string) => {
     setSearch(value);
     setPage(1);
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => setDebouncedSearch(value), 300);
-  };
+  }, []);
+
+  // Stable callbacks so MemoRecordCard doesn't re-render
+  const onEdit = useCallback((r: RecordType) => setEditRecord(r), []);
+  const onDelete = useCallback((r: RecordType) => setDeleteRecord(r), []);
+  const onOpenCreate = useCallback(() => setShowCreate(true), []);
 
   const totalPages = data ? Math.ceil(data.resultsCount / (data.limit || 50)) : 1;
   const hasNextPage = page < totalPages;
   const hasPrevPage = page > 1;
+
+  const renderItem = useCallback(({ item }: { item: RecordType }) => (
+    <MemoRecordCard record={item} onEdit={onEdit} onDelete={onDelete} />
+  ), [onEdit, onDelete]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }} edges={["top"]}>
@@ -46,7 +58,7 @@ export default function RecordsScreen() {
               </SearchField.Group>
             </SearchField>
           </View>
-          <Button isIconOnly variant="primary" onPress={() => setShowCreate(true)}>
+          <Button isIconOnly variant="primary" onPress={onOpenCreate}>
             <Ionicons name="add" size={24} color="#fff" />
           </Button>
         </View>
@@ -69,9 +81,7 @@ export default function RecordsScreen() {
           <FlatList
             data={data?.records || []}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <RecordCard record={item} onEdit={setEditRecord} onDelete={setDeleteRecord} />
-            )}
+            renderItem={renderItem}
             contentContainerStyle={{ gap: 8, paddingBottom: 100 }}
             refreshControl={
               <RefreshControl
