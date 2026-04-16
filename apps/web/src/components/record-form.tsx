@@ -1,6 +1,6 @@
 import { Modal, Button, Input, toast } from "@heroui/react";
-import { useState, useEffect } from "react";
-import { FaEye, FaEyeSlash, FaSync } from "react-icons/fa";
+import { useState, useEffect, useCallback } from "react";
+import { FaEye, FaEyeSlash, FaSync, FaCloudUploadAlt, FaTimes } from "react-icons/fa";
 import { useCreateRecord, useUpdateRecord } from "@/hooks/use-records";
 import type { Record as RecordType } from "@classified/shared";
 
@@ -26,6 +26,8 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
   const [icon, setIcon] = useState("");
   const [showPassword, setShowPassword] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const createRecord = useCreateRecord();
   const updateRecord = useUpdateRecord();
@@ -55,6 +57,49 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
     setShowPassword(true);
     setTimeout(() => setIsGenerating(false), 600);
   };
+
+  const handleImageUpload = useCallback(async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast.danger("Please upload an image file");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "classified");
+
+      const cloudinaryUrl = import.meta.env.VITE_CLOUDINARY_URL || "https://api.cloudinary.com/v1_1/dqkyatgoy/image/upload";
+      const res = await fetch(cloudinaryUrl, { method: "POST", body: formData });
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const data = await res.json();
+      setIcon(data.secure_url || data.url);
+      toast.success("Image uploaded!");
+    } catch {
+      toast.danger("Failed to upload image");
+    } finally {
+      setIsUploading(false);
+    }
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleImageUpload(file);
+  }, [handleImageUpload]);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback(() => {
+    setIsDragging(false);
+  }, []);
 
   const handleSubmit = async () => {
     const data = {
@@ -87,66 +132,107 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
     <Modal defaultOpen onOpenChange={(open) => !open && onClose()}>
       <Modal.Backdrop>
         <Modal.Container size="lg">
-        <Modal.Dialog>
-          <Modal.CloseTrigger />
-          <Modal.Header>
-            <Modal.Heading>{isEditing ? "Edit Record" : "Add Record"}</Modal.Heading>
-          </Modal.Header>
-          <Modal.Body className="flex flex-col gap-4">
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium">Site / Service</span>
-              <Input value={site} onChange={(e) => setSite(e.target.value)} autoFocus />
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium">Username</span>
-              <Input value={username} onChange={(e) => setUsername(e.target.value)} />
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium">Email</span>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium">Password</span>
-              <div className="relative">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pr-20"
-                />
-                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+          <Modal.Dialog>
+            <Modal.CloseTrigger />
+            <Modal.Header>
+              <Modal.Heading>{isEditing ? "Edit Record" : "Add Record"}</Modal.Heading>
+            </Modal.Header>
+            <Modal.Body className="flex flex-col gap-4">
+              {/* Image upload / preview */}
+              {icon ? (
+                <div className="relative w-fit p-4 border-2 border-border rounded-lg">
+                  <button
+                    type="button"
+                    onClick={() => setIcon("")}
+                    className="absolute top-1 right-1 text-default-400 hover:text-foreground"
+                  >
+                    <FaTimes size={14} />
+                  </button>
+                  <img src={icon} alt={site} className="w-14 h-14 rounded-md object-contain" />
+                </div>
+              ) : (
+                <div
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onClick={() => {
+                    const input = document.createElement("input");
+                    input.type = "file";
+                    input.accept = "image/*";
+                    input.onchange = (e) => {
+                      const file = (e.target as HTMLInputElement).files?.[0];
+                      if (file) handleImageUpload(file);
+                    };
+                    input.click();
+                  }}
+                  className={`flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                    isDragging
+                      ? "border-primary bg-primary/10"
+                      : "border-border hover:border-default-400"
+                  }`}
+                >
+                  {isUploading ? (
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+                  ) : (
+                    <>
+                      <FaCloudUploadAlt size={24} className="text-default-400" />
+                      <p className="text-sm text-default-400">
+                        Drop an image here or click to upload
+                      </p>
+                    </>
+                  )}
+                </div>
+              )}
+
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium">Site / Service</span>
+                <Input value={site} onChange={(e) => setSite(e.target.value)} autoFocus />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium">Username</span>
+                <Input value={username} onChange={(e) => setUsername(e.target.value)} />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium">Email</span>
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              </label>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-medium">Password</span>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="new-password"
+                    className="flex-1"
+                  />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-default-400 hover:text-foreground"
+                    className={`p-2 rounded-md transition-colors ${showPassword ? "text-primary" : "text-default-400"} hover:text-foreground`}
                   >
-                    {showPassword ? <FaEye size={14} /> : <FaEyeSlash size={14} />}
+                    {showPassword ? <FaEye size={16} /> : <FaEyeSlash size={16} />}
                   </button>
                   <button
                     type="button"
                     onClick={handleGeneratePassword}
-                    className="text-default-400 hover:text-foreground"
+                    title="Generate Password"
+                    className="p-2 rounded-md text-default-400 hover:text-foreground transition-colors"
                   >
-                    <FaSync size={14} className={isGenerating ? "animate-spin" : ""} />
+                    <FaSync size={16} className={isGenerating ? "animate-spin" : ""} />
                   </button>
                 </div>
               </div>
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium">Icon URL</span>
-              <Input value={icon} onChange={(e) => setIcon(e.target.value)} />
-              <span className="text-xs text-default-400">Optional</span>
-            </label>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button slot="close" variant="outline">
-              Cancel
-            </Button>
-            <Button variant="primary" onPress={handleSubmit} isDisabled={isLoading}>
-              {isEditing ? "Save" : "Create"}
-            </Button>
-          </Modal.Footer>
-        </Modal.Dialog>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button slot="close" variant="outline">
+                Cancel
+              </Button>
+              <Button variant="primary" onPress={handleSubmit} isDisabled={isLoading}>
+                {isEditing ? "Save" : "Create"}
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
         </Modal.Container>
       </Modal.Backdrop>
     </Modal>
