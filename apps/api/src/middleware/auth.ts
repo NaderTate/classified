@@ -1,5 +1,5 @@
 import type { Context, Next } from "hono";
-import { verifyAccessToken } from "../lib/jwt";
+import { verifyAccessToken } from "../lib/jwt.js";
 
 declare module "hono" {
   interface ContextVariableMap {

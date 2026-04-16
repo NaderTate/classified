@@ -1,5 +1,5 @@
 import type { Context, Next } from "hono";
-import { prisma } from "../lib/prisma";
+import { prisma } from "../lib/prisma.js";
 
 export async function ownershipMiddleware(c: Context, next: Next) {
   const recordId = c.req.param("id");

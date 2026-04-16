@@ -2,7 +2,7 @@ import { handle } from "hono/vercel";
 
 // Re-export the app — Vercel's bundler will follow the imports
 // Need to use relative paths since Vercel doesn't read tsconfig paths
-import app from "../src/index";
+import app from "../src/index.js";
 
 export const config = {
   runtime: "nodejs",

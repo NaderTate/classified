@@ -1,10 +1,22 @@
 import { Hono } from "hono";
 import { CreateRecordSchema, UpdateRecordSchema, RecordQuerySchema } from "@classified/shared";
-import { prisma } from "../lib/prisma";
-import { encrypt, decrypt } from "../lib/encryption";
-import { authMiddleware } from "../middleware/auth";
-import { ownershipMiddleware } from "../middleware/ownership";
-import type { Record as PrismaRecord } from "@prisma/client";
+import { prisma } from "../lib/prisma.js";
+import { encrypt, decrypt } from "../lib/encryption.js";
+import { authMiddleware } from "../middleware/auth.js";
+import { ownershipMiddleware } from "../middleware/ownership.js";
+
+type PrismaRecord = {
+  id: string;
+  site: string | null;
+  icon: string | null;
+  email: string | null;
+  username: string | null;
+  encryptedPassword: string | null;
+  encryptionIv: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+};
 
 const records = new Hono();
 
