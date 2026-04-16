@@ -35,14 +35,6 @@ function Dashboard() {
 
   const totalPages = data ? Math.ceil(data.resultsCount / data.limit) : 1;
 
-  const buildPages = () => {
-    const pages: number[] = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pages.push(i);
-    }
-    return pages;
-  };
-
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
@@ -103,33 +95,7 @@ function Dashboard() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center">
-          <Pagination>
-            <Pagination.Content>
-              <Pagination.Item>
-                <Pagination.Previous
-                  onPress={() => setPage((p) => Math.max(1, p - 1))}
-                  isDisabled={page === 1}
-                >
-                  <Pagination.PreviousIcon />
-                </Pagination.Previous>
-              </Pagination.Item>
-              {buildPages().map((p) => (
-                <Pagination.Item key={p}>
-                  <Pagination.Link isActive={p === page} onPress={() => setPage(p)}>
-                    {p}
-                  </Pagination.Link>
-                </Pagination.Item>
-              ))}
-              <Pagination.Item>
-                <Pagination.Next
-                  onPress={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  isDisabled={page === totalPages}
-                >
-                  <Pagination.NextIcon />
-                </Pagination.Next>
-              </Pagination.Item>
-            </Pagination.Content>
-          </Pagination>
+          <Pagination total={totalPages} page={page} onChange={setPage} />
         </div>
       )}
 

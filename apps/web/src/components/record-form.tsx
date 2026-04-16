@@ -1,7 +1,7 @@
 import { Modal, Button, Input, toast } from "@heroui/react";
 import { useState, useEffect } from "react";
+import { FaEye, FaEyeSlash, FaSync } from "react-icons/fa";
 import { useCreateRecord, useUpdateRecord } from "@/hooks/use-records";
-import PasswordGenerator from "./password-generator";
 import type { Record as RecordType } from "@classified/shared";
 
 interface RecordFormProps {
@@ -10,13 +10,22 @@ interface RecordFormProps {
   record?: RecordType | null;
 }
 
+function generatePassword(length = 20): string {
+  const charset =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|:;<>?,./~";
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  return Array.from(array, (byte) => charset[byte % charset.length]).join("");
+}
+
 export default function RecordForm({ isOpen, onClose, record }: RecordFormProps) {
   const [site, setSite] = useState("");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [icon, setIcon] = useState("");
-  const [showGenerator, setShowGenerator] = useState(false);
+  const [showPassword, setShowPassword] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const createRecord = useCreateRecord();
   const updateRecord = useUpdateRecord();
@@ -36,8 +45,16 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
       setPassword("");
       setIcon("");
     }
-    setShowGenerator(false);
+    setShowPassword(true);
+    setIsGenerating(false);
   }, [record, isOpen]);
+
+  const handleGeneratePassword = () => {
+    setIsGenerating(true);
+    setPassword(generatePassword());
+    setShowPassword(true);
+    setTimeout(() => setIsGenerating(false), 600);
+  };
 
   const handleSubmit = async () => {
     const data = {
@@ -81,25 +98,40 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
               <Input value={site} onChange={(e) => setSite(e.target.value)} autoFocus />
             </label>
             <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium">Email</span>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            </label>
-            <label className="flex flex-col gap-1">
               <span className="text-sm font-medium">Username</span>
               <Input value={username} onChange={(e) => setUsername(e.target.value)} />
             </label>
             <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium">Password</span>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <span className="text-sm font-medium">Email</span>
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             </label>
-            <Button size="sm" variant="secondary" onPress={() => setShowGenerator(!showGenerator)}>
-              {showGenerator ? "Hide" : "Generate"} Password
-            </Button>
-            {showGenerator && <PasswordGenerator onSelect={setPassword} />}
+            <label className="flex flex-col gap-1">
+              <span className="text-sm font-medium">Password</span>
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pr-20"
+                />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-default-400 hover:text-foreground"
+                  >
+                    {showPassword ? <FaEye size={14} /> : <FaEyeSlash size={14} />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleGeneratePassword}
+                    className="text-default-400 hover:text-foreground"
+                  >
+                    <FaSync size={14} className={isGenerating ? "animate-spin" : ""} />
+                  </button>
+                </div>
+              </div>
+            </label>
             <label className="flex flex-col gap-1">
               <span className="text-sm font-medium">Icon URL</span>
               <Input value={icon} onChange={(e) => setIcon(e.target.value)} />
