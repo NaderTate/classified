@@ -1,5 +1,5 @@
-import { View, Alert, Pressable, Image } from "react-native";
-import { BottomSheet, Button, Input, InputGroup, useToast } from "heroui-native";
+import { View, Alert, Pressable, Image, Modal, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import { Button, Input, InputGroup, useToast } from "heroui-native";
 import { useState, useEffect, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -116,81 +116,73 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
   const isPending = createRecord.isPending || updateRecord.isPending;
 
   return (
-    <BottomSheet isOpen={isOpen} onOpenChange={(open) => !open && onClose()} animation="disable-all">
-      <BottomSheet.Portal>
-        <BottomSheet.Overlay />
-        <BottomSheet.Content snapPoints={["70%"]} animateOnMount={false}>
-          <View style={{ paddingHorizontal: 20, paddingBottom: 32, flex: 1 }}>
-            {/* Header */}
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <BottomSheet.Title>{isEditing ? "Edit Record" : "New Record"}</BottomSheet.Title>
-              <BottomSheet.Close />
-            </View>
+    <Modal visible={isOpen} animationType="slide" transparent={false} onRequestClose={onClose}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1, backgroundColor: "#000" }}
+      >
+        {/* Header */}
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20, paddingTop: Platform.OS === "ios" ? 56 : 16, paddingBottom: 12 }}>
+          <Pressable onPress={onClose}>
+            <Ionicons name="close" size={28} color="#a1a1aa" />
+          </Pressable>
+          <Button variant="primary" size="sm" onPress={handleSave} isDisabled={isPending}>
+            <Button.Label>{isPending ? "Saving..." : isEditing ? "Save" : "Create"}</Button.Label>
+          </Button>
+        </View>
 
-            {/* Icon picker */}
-            <Pressable
-              onPress={handlePickImage}
-              style={{
-                alignSelf: "center",
-                marginBottom: 16,
-                width: 64,
-                height: 64,
-                borderRadius: 12,
-                backgroundColor: "#27272a",
-                justifyContent: "center",
-                alignItems: "center",
-                overflow: "hidden",
-              }}
-            >
-              {icon ? (
-                <Image source={{ uri: icon }} style={{ width: 64, height: 64, borderRadius: 12 }} />
-              ) : isUploading ? (
-                <Ionicons name="cloud-upload" size={24} color="#3b82f6" />
-              ) : (
-                <Ionicons name="camera" size={24} color="#71717a" />
-              )}
-            </Pressable>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, gap: 12 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Icon picker */}
+          <Pressable
+            onPress={handlePickImage}
+            style={{
+              alignSelf: "center",
+              marginBottom: 8,
+              width: 72,
+              height: 72,
+              borderRadius: 16,
+              backgroundColor: "#18181b",
+              justifyContent: "center",
+              alignItems: "center",
+              overflow: "hidden",
+            }}
+          >
+            {icon ? (
+              <Image source={{ uri: icon }} style={{ width: 72, height: 72, borderRadius: 16 }} />
+            ) : isUploading ? (
+              <Ionicons name="cloud-upload" size={28} color="#3b82f6" />
+            ) : (
+              <Ionicons name="camera" size={28} color="#71717a" />
+            )}
+          </Pressable>
 
-            {/* Compact form */}
-            <View style={{ gap: 10, flex: 1 }}>
-              <Input variant="secondary" placeholder="Site / Service" value={site} onChangeText={setSite} />
-              <Input variant="secondary" placeholder="Username" value={username} onChangeText={setUsername} />
-              <Input variant="secondary" placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
-              <InputGroup>
-                <InputGroup.Input
-                  variant="secondary"
-                  placeholder="Password"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!showPassword}
-                />
-                <InputGroup.Suffix style={{ gap: 8, flexDirection: "row", alignItems: "center", paddingRight: 8 }}>
-                  <Pressable onPress={() => setShowPassword(!showPassword)}>
-                    <Ionicons name={showPassword ? "eye" : "eye-off"} size={18} color={showPassword ? "#3b82f6" : "#71717a"} />
-                  </Pressable>
-                  <Pressable onPress={() => { setPassword(generatePassword()); setShowPassword(true); }}>
-                    <Ionicons name="refresh" size={18} color="#71717a" />
-                  </Pressable>
-                </InputGroup.Suffix>
-              </InputGroup>
-            </View>
-
-            {/* Footer */}
-            <View style={{ flexDirection: "row", gap: 12, marginTop: 16 }}>
-              <View style={{ flex: 1 }}>
-                <Button variant="outline" onPress={onClose}>
-                  <Button.Label>Cancel</Button.Label>
-                </Button>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Button variant="primary" onPress={handleSave} isDisabled={isPending}>
-                  <Button.Label>{isPending ? "Saving..." : isEditing ? "Save" : "Create"}</Button.Label>
-                </Button>
-              </View>
-            </View>
-          </View>
-        </BottomSheet.Content>
-      </BottomSheet.Portal>
-    </BottomSheet>
+          {/* Form fields */}
+          <Input variant="secondary" placeholder="Site / Service" value={site} onChangeText={setSite} />
+          <Input variant="secondary" placeholder="Username" value={username} onChangeText={setUsername} />
+          <Input variant="secondary" placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+          <InputGroup>
+            <InputGroup.Input
+              variant="secondary"
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+            />
+            <InputGroup.Suffix style={{ gap: 8, flexDirection: "row", alignItems: "center", paddingRight: 8 }}>
+              <Pressable onPress={() => setShowPassword(!showPassword)}>
+                <Ionicons name={showPassword ? "eye" : "eye-off"} size={18} color={showPassword ? "#3b82f6" : "#71717a"} />
+              </Pressable>
+              <Pressable onPress={() => { setPassword(generatePassword()); setShowPassword(true); }}>
+                <Ionicons name="refresh" size={18} color="#71717a" />
+              </Pressable>
+            </InputGroup.Suffix>
+          </InputGroup>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </Modal>
   );
 }
