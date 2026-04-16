@@ -1,0 +1,40 @@
+{
+  "name": "@classified/api",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src/",
+    "type-check": "tsc --noEmit",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist",
+    "db:generate": "prisma generate --schema=src/prisma/schema.prisma",
+    "db:push": "prisma db push --schema=src/prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@classified/shared": "workspace:*",
+    "@hono/node-server": "^1.14.1",
+    "@prisma/client": "^6.6.0",
+    "bcryptjs": "^2.4.3",
+    "hono": "^4.7.7",
+    "jose": "^6.0.11",
+    "resend": "^4.5.1",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.15.3",
+    "eslint": "^9.26.0",
+    "prisma": "^6.6.0",
+    "prettier": "^3.5.3",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.3"
+  }
+}
