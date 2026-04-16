@@ -1,5 +1,5 @@
 import "../global.css";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Slot, useRouter, useSegments } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { HeroUINativeProvider } from "heroui-native";
@@ -12,6 +12,7 @@ function AuthRedirect() {
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const hasRedirected = useRef(false);
 
   useEffect(() => {
     if (isLoading) return;
@@ -20,10 +21,12 @@ function AuthRedirect() {
 
     if (!isAuthenticated && !inAuthGroup) {
       router.replace("/(auth)/login");
+      hasRedirected.current = true;
     } else if (isAuthenticated && inAuthGroup) {
       router.replace("/(tabs)");
+      hasRedirected.current = true;
     }
-  }, [isAuthenticated, isLoading, segments]);
+  }, [isAuthenticated, isLoading]);
 
   return <Slot />;
 }
