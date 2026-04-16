@@ -1,6 +1,6 @@
-import { View, Alert, Pressable, Image, Modal, ScrollView, Text, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity, StyleSheet, InteractionManager } from "react-native";
+import { View, Alert, Pressable, Image, Modal, ScrollView, Text, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity, StyleSheet, InteractionManager, Animated, PanResponder, Dimensions } from "react-native";
 import { useToast } from "heroui-native";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
@@ -127,10 +127,33 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
 
   const isPending = createRecord.isPending || updateRecord.isPending;
 
+  const translateY = useRef(new Animated.Value(0)).current;
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_, g) => g.dy > 10,
+      onPanResponderMove: (_, g) => {
+        if (g.dy > 0) translateY.setValue(g.dy);
+      },
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > 80) {
+          onClose();
+          translateY.setValue(0);
+        } else {
+          Animated.spring(translateY, { toValue: 0, useNativeDriver: true, tension: 80, friction: 10 }).start();
+        }
+      },
+    })
+  ).current;
+
+  useEffect(() => {
+    if (isOpen) translateY.setValue(0);
+  }, [isOpen]);
+
   return (
     <Modal visible={isOpen} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
       <Pressable style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.65)" }} onPress={onClose} />
-      <View
+      <Animated.View
         style={{
           position: "absolute",
           left: 0,
@@ -142,10 +165,13 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
           paddingTop: 12,
           paddingBottom: insets.bottom || 16,
           maxHeight: "75%",
+          transform: [{ translateY }],
         }}
       >
-        {/* Handle */}
-        <View style={{ alignSelf: "center", width: 40, height: 4, borderRadius: 2, backgroundColor: "#3f3f46", marginBottom: 12 }} />
+        {/* Handle — drag target for swipe to dismiss */}
+        <View {...panResponder.panHandlers} style={{ paddingVertical: 8, alignItems: "center" }}>
+          <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: "#3f3f46" }} />
+        </View>
 
         {/* Header — always render for instant visual */}
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, marginBottom: 16 }}>
@@ -209,7 +235,7 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
         ) : (
           <View style={{ height: 300 }} />
         )}
-      </View>
+      </Animated.View>
     </Modal>
   );
 }
