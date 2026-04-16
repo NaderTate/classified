@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useMemo } from "react";
+import { useState, useRef, useMemo } from "react";
 import { View, FlatList, Text, RefreshControl } from "react-native";
 import { SearchField, Button, Skeleton } from "heroui-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,10 +18,8 @@ export default function RecordsScreen() {
   const [showCreate, setShowCreate] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
-  const queryParams = useMemo(() => ({ page, search: debouncedSearch }), [page, debouncedSearch]);
-  const { data, isLoading, refetch, isRefetching, isFetching } = useRecords(queryParams);
-
-  console.log("[RecordsScreen] render", { page, debouncedSearch, isLoading, isFetching, recordCount: data?.records?.length, totalCount: data?.totalCount });
+  const queryParams = useMemo(() => ({ page, search: debouncedSearch, limit: 50 }), [page, debouncedSearch]);
+  const { data, isLoading, refetch, isRefetching } = useRecords(queryParams);
 
   const handleSearch = (value: string) => {
     setSearch(value);
@@ -30,15 +28,9 @@ export default function RecordsScreen() {
     timeoutRef.current = setTimeout(() => setDebouncedSearch(value), 300);
   };
 
-  const handleEndReached = useCallback(() => {
-    // Don't paginate if already fetching or no more data
-    if (isFetching) return;
-    if (!data) return;
-    const loadedSoFar = page * (data.limit || 12);
-    if (loadedSoFar >= data.resultsCount) return;
-    console.log("[RecordsScreen] onEndReached — loading page", page + 1);
-    setPage((p) => p + 1);
-  }, [data, page, isFetching]);
+  const totalPages = data ? Math.ceil(data.resultsCount / (data.limit || 50)) : 1;
+  const hasNextPage = page < totalPages;
+  const hasPrevPage = page > 1;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }} edges={["top"]}>
@@ -80,7 +72,7 @@ export default function RecordsScreen() {
             renderItem={({ item }) => (
               <RecordCard record={item} onEdit={setEditRecord} onDelete={setDeleteRecord} />
             )}
-            contentContainerStyle={{ gap: 8, paddingBottom: 24 }}
+            contentContainerStyle={{ gap: 8, paddingBottom: 100 }}
             refreshControl={
               <RefreshControl
                 refreshing={isRefetching}
@@ -88,8 +80,6 @@ export default function RecordsScreen() {
                 tintColor="#3b82f6"
               />
             }
-            onEndReached={handleEndReached}
-            onEndReachedThreshold={0.5}
             ListEmptyComponent={
               <View style={{ alignItems: "center", paddingTop: 48 }}>
                 <Text style={{ color: "#71717a" }}>
@@ -98,6 +88,21 @@ export default function RecordsScreen() {
                     : "No records yet. Tap + to add one!"}
                 </Text>
               </View>
+            }
+            ListFooterComponent={
+              totalPages > 1 ? (
+                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 16, paddingVertical: 16 }}>
+                  <Button size="sm" variant="outline" isDisabled={!hasPrevPage} onPress={() => setPage((p) => p - 1)}>
+                    <Button.Label>Previous</Button.Label>
+                  </Button>
+                  <Text style={{ color: "#a1a1aa", fontSize: 14 }}>
+                    {page} / {totalPages}
+                  </Text>
+                  <Button size="sm" variant="outline" isDisabled={!hasNextPage} onPress={() => setPage((p) => p + 1)}>
+                    <Button.Label>Next</Button.Label>
+                  </Button>
+                </View>
+              ) : null
             }
           />
         )}
