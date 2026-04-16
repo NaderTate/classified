@@ -117,7 +117,7 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
   const isPending = createRecord.isPending || updateRecord.isPending;
 
   return (
-    <Modal visible={isOpen} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
+    <Modal visible={isOpen} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <Pressable style={s.backdrop} onPress={onClose} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
