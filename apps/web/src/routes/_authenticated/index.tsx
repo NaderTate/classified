@@ -4,6 +4,8 @@ import { Button, Input, Pagination, Skeleton } from "@heroui/react";
 import { FaPlus, FaSearch } from "react-icons/fa";
 import { useRecords } from "@/hooks/use-records";
 import RecordCard from "@/components/record-card";
+import RecordForm from "@/components/record-form";
+import ConfirmDelete from "@/components/confirm-delete";
 import type { Record as RecordType } from "@classified/shared";
 
 export const Route = createFileRoute("/_authenticated/")({
@@ -40,11 +42,6 @@ function Dashboard() {
     }
     return pages;
   };
-
-  // Suppress unused state until modals are wired in Task 9
-  void editRecord;
-  void deleteRecord;
-  void showCreateForm;
 
   return (
     <div className="flex flex-col gap-6">
@@ -134,7 +131,19 @@ function Dashboard() {
         </div>
       )}
 
-      {/* TODO: RecordForm and ConfirmDelete modals will be wired in Task 9 */}
+      <RecordForm
+        isOpen={showCreateForm || !!editRecord}
+        onClose={() => {
+          setShowCreateForm(false);
+          setEditRecord(null);
+        }}
+        record={editRecord}
+      />
+      <ConfirmDelete
+        isOpen={!!deleteRecord}
+        onClose={() => setDeleteRecord(null)}
+        record={deleteRecord}
+      />
     </div>
   );
 }
