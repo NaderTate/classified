@@ -38,8 +38,8 @@
 /* Gradient background glow */
 body.dark {
   background:
-    radial-gradient(ellipse 80% 80% at -10% 90%, rgba(0, 112, 243, 0.35) 0%, transparent 70%),
-    radial-gradient(ellipse 80% 80% at 110% -10%, rgba(168, 85, 247, 0.3) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 80% at -10% 90%, rgba(0, 112, 243, 0.2) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 80% at 110% -10%, rgba(168, 85, 247, 0.18) 0%, transparent 70%),
     var(--background, #09090b);
   background-attachment: fixed;
 }
