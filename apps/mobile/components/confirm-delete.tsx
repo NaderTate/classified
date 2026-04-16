@@ -28,7 +28,7 @@ export default function ConfirmDelete({ isOpen, onClose, record }: ConfirmDelete
   };
 
   return (
-    <BottomSheet isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <BottomSheet isOpen={isOpen} onOpenChange={(open) => !open && onClose()} animation="disable-all">
       <BottomSheet.Portal>
         <BottomSheet.Overlay />
         <BottomSheet.Content snapPoints={["30%"]}>

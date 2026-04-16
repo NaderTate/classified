@@ -15,9 +15,11 @@ interface RecordFormProps {
 function generatePassword(length = 20): string {
   const charset =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|:;<>?,./~";
-  const array = new Uint8Array(length);
-  globalThis.crypto.getRandomValues(array);
-  return Array.from(array, (byte) => charset[byte % charset.length]).join("");
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += charset.charAt(Math.floor(Math.random() * charset.length));
+  }
+  return result;
 }
 
 export default function RecordForm({ isOpen, onClose, record }: RecordFormProps) {
@@ -114,10 +116,10 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
   const isPending = createRecord.isPending || updateRecord.isPending;
 
   return (
-    <BottomSheet isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <BottomSheet isOpen={isOpen} onOpenChange={(open) => !open && onClose()} animation="disable-all">
       <BottomSheet.Portal>
         <BottomSheet.Overlay />
-        <BottomSheet.Content snapPoints={["70%"]}>
+        <BottomSheet.Content snapPoints={["70%"]} animateOnMount={false}>
           <View style={{ paddingHorizontal: 20, paddingBottom: 32, flex: 1 }}>
             {/* Header */}
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
