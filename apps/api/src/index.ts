@@ -3,6 +3,8 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { serve } from "@hono/node-server";
 import { authRoutes } from "@/routes/auth.js";
+import { recordsRoutes } from "@/routes/records.js";
+import { userRoutes } from "@/routes/user.js";
 
 const app = new Hono();
 
@@ -20,6 +22,8 @@ app.use(
 app.get("/health", (c) => c.json({ status: "ok" }));
 
 app.route("/auth", authRoutes);
+app.route("/records", recordsRoutes);
+app.route("/user", userRoutes);
 
 if (process.env.NODE_ENV !== "production") {
   const port = parseInt(process.env.PORT || "3001", 10);
