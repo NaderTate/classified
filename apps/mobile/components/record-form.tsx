@@ -1,6 +1,6 @@
-import { View, Alert, Pressable, Image, Modal, ScrollView, Text, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Alert, Pressable, Image, Modal, ScrollView, Text, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity, StyleSheet, Animated, Dimensions } from "react-native";
 import { useToast } from "heroui-native";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
@@ -116,13 +116,34 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
 
   const isPending = createRecord.isPending || updateRecord.isPending;
 
+  const SCREEN_HEIGHT = Dimensions.get("window").height;
+  const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (isOpen) {
+      Animated.parallel([
+        Animated.timing(fadeAnim, { toValue: 1, duration: 200, useNativeDriver: true }),
+        Animated.timing(slideAnim, { toValue: 0, duration: 250, useNativeDriver: true }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(fadeAnim, { toValue: 0, duration: 150, useNativeDriver: true }),
+        Animated.timing(slideAnim, { toValue: SCREEN_HEIGHT, duration: 200, useNativeDriver: true }),
+      ]).start();
+    }
+  }, [isOpen]);
+
   return (
-    <Modal visible={isOpen} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
-      <Pressable style={s.backdrop} onPress={onClose} />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={[s.card, { paddingBottom: insets.bottom + 16 }]}
-      >
+    <Modal visible={isOpen} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
+      <Animated.View style={[s.backdrop, { opacity: fadeAnim }]}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+      </Animated.View>
+      <Animated.View style={{ transform: [{ translateY: slideAnim }], position: "absolute", left: 0, right: 0, bottom: 0 }}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={[s.card, { paddingBottom: insets.bottom + 16 }]}
+        >
         {/* Handle */}
         <View style={s.handle} />
 
@@ -177,17 +198,14 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      </Animated.View>
     </Modal>
   );
 }
 
 const s = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.65)" },
+  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.65)" },
   card: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
     backgroundColor: "#18181b",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
