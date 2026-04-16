@@ -4,6 +4,8 @@ import { SearchField, Button, Skeleton } from "heroui-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRecords } from "@/hooks/use-records";
 import RecordCard from "@/components/record-card";
+import RecordForm from "@/components/record-form";
+import ConfirmDelete from "@/components/confirm-delete";
 import type { Record as RecordType } from "@classified/shared";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -90,7 +92,19 @@ export default function RecordsScreen() {
           />
         )}
 
-        {/* TODO: RecordForm and ConfirmDelete dialogs — wired in Task 7 */}
+        <RecordForm
+          isOpen={showCreate || !!editRecord}
+          onClose={() => {
+            setShowCreate(false);
+            setEditRecord(null);
+          }}
+          record={editRecord}
+        />
+        <ConfirmDelete
+          isOpen={!!deleteRecord}
+          onClose={() => setDeleteRecord(null)}
+          record={deleteRecord}
+        />
       </View>
     </SafeAreaView>
   );
