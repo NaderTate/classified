@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Button, Card, Input, Spinner } from "@heroui/react";
+import { Button, Card, Input, Spinner, toast } from "@heroui/react";
 import { useState } from "react";
 import { api } from "@/lib/api-client";
-import toast from "react-hot-toast";
 
 export const Route = createFileRoute("/reset-password")({
   component: ResetPasswordPage,
@@ -21,7 +20,7 @@ function ResetPasswordPage() {
       await api.auth.resetPassword({ email });
       setSent(true);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to send reset email");
+      toast.danger(err instanceof Error ? err.message : "Failed to send reset email");
     } finally {
       setIsLoading(false);
     }

@@ -1,7 +1,6 @@
-import { Button, Input } from "@heroui/react";
+import { Button, Input, toast } from "@heroui/react";
 import { useState, useCallback } from "react";
 import { FaDice, FaCopy } from "react-icons/fa";
-import toast from "react-hot-toast";
 
 interface PasswordGeneratorProps {
   onSelect: (password: string) => void;

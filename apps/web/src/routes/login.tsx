@@ -1,9 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Button, Card, Input, Separator, Spinner } from "@heroui/react";
+import { Button, Card, Input, Separator, Spinner, toast } from "@heroui/react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { api } from "@/lib/api-client";
-import toast from "react-hot-toast";
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import type { LoginResponse } from "@classified/shared";
 
@@ -35,7 +34,7 @@ function LoginPage() {
         navigate({ to: "/" });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Login failed");
+      toast.danger(err instanceof Error ? err.message : "Login failed");
     } finally {
       setIsLoading(false);
     }
@@ -49,7 +48,7 @@ function LoginPage() {
       await loginWithTwoFactor({ email: twoFactorEmail, code });
       navigate({ to: "/" });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Invalid code");
+      toast.danger(err instanceof Error ? err.message : "Invalid code");
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +84,7 @@ function LoginPage() {
         navigate({ to: "/" });
       })
       .catch((err) => {
-        toast.error(err instanceof Error ? err.message : "OAuth login failed");
+        toast.danger(err instanceof Error ? err.message : "OAuth login failed");
         window.history.replaceState({}, "", "/login");
         setIsLoading(false);
       });

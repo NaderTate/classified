@@ -1,8 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Button, Card, Input, Spinner } from "@heroui/react";
+import { Button, Card, Input, Spinner, toast } from "@heroui/react";
 import { useState } from "react";
 import { api } from "@/lib/api-client";
-import toast from "react-hot-toast";
 
 export const Route = createFileRoute("/new-password")({
   component: NewPasswordPage,
@@ -19,7 +18,7 @@ function NewPasswordPage() {
     const token = params.get("token");
 
     if (!token) {
-      toast.error("Missing reset token");
+      toast.danger("Missing reset token");
       return;
     }
 
@@ -30,7 +29,7 @@ function NewPasswordPage() {
       toast.success(result.success);
       navigate({ to: "/login" });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to reset password");
+      toast.danger(err instanceof Error ? err.message : "Failed to reset password");
     } finally {
       setIsLoading(false);
     }

@@ -2,7 +2,7 @@ import { Modal, Button, Input, useOverlayState } from "@heroui/react";
 import { useState, useEffect } from "react";
 import { useCreateRecord, useUpdateRecord } from "@/hooks/use-records";
 import PasswordGenerator from "./password-generator";
-import toast from "react-hot-toast";
+import { toast } from "@heroui/react";
 import type { Record as RecordType } from "@classified/shared";
 
 interface RecordFormProps {
@@ -66,7 +66,7 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
       }
       onClose();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to save record");
+      toast.danger(err instanceof Error ? err.message : "Failed to save record");
     }
   };
 

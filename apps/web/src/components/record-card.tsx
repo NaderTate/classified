@@ -1,7 +1,5 @@
-import { Card, Button } from "@heroui/react";
-import { FaCopy, FaUser, FaEnvelope, FaLock, FaEllipsisV, FaEdit, FaTrash } from "react-icons/fa";
-import { useState } from "react";
-import toast from "react-hot-toast";
+import { Card, Button, Dropdown, toast } from "@heroui/react";
+import { FaCopy, FaUser, FaEnvelope, FaLock, FaEllipsisV } from "react-icons/fa";
 import type { Record as RecordType } from "@classified/shared";
 
 interface RecordCardProps {
@@ -11,8 +9,6 @@ interface RecordCardProps {
 }
 
 export default function RecordCard({ record, onEdit, onDelete }: RecordCardProps) {
-  const [showMenu, setShowMenu] = useState(false);
-
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast.success(`${label} copied!`);
@@ -40,27 +36,28 @@ export default function RecordCard({ record, onEdit, onDelete }: RecordCardProps
             </div>
           )}
           <h3 className="font-bold text-lg flex-1">{record.site || "Untitled"}</h3>
-          <div className="relative">
-            <Button isIconOnly size="sm" variant="ghost" onPress={() => setShowMenu(!showMenu)}>
-              <FaEllipsisV />
-            </Button>
-            {showMenu && (
-              <div className="absolute right-0 top-full mt-1 bg-surface border border-border rounded-lg shadow-lg z-10 min-w-[120px]">
-                <button
-                  className="w-full px-3 py-2 text-sm text-left hover:bg-default flex items-center gap-2 rounded-t-lg"
-                  onClick={() => { onEdit(record); setShowMenu(false); }}
-                >
-                  <FaEdit size={12} /> Edit
-                </button>
-                <button
-                  className="w-full px-3 py-2 text-sm text-left hover:bg-default flex items-center gap-2 text-danger rounded-b-lg"
-                  onClick={() => { onDelete(record); setShowMenu(false); }}
-                >
-                  <FaTrash size={12} /> Delete
-                </button>
-              </div>
-            )}
-          </div>
+          <Dropdown>
+            <Dropdown.Trigger>
+              <Button isIconOnly size="sm" variant="ghost">
+                <FaEllipsisV />
+              </Button>
+            </Dropdown.Trigger>
+            <Dropdown.Popover>
+              <Dropdown.Menu
+                onAction={(key) => {
+                  if (key === "edit") onEdit(record);
+                  if (key === "delete") onDelete(record);
+                }}
+              >
+                <Dropdown.Item id="edit" textValue="Edit">
+                  Edit
+                </Dropdown.Item>
+                <Dropdown.Item id="delete" textValue="Delete" variant="danger">
+                  Delete
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown.Popover>
+          </Dropdown>
         </div>
 
         {/* Username row */}

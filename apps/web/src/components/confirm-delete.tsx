@@ -1,6 +1,6 @@
 import { Modal, Button, useOverlayState } from "@heroui/react";
 import { useDeleteRecord } from "@/hooks/use-records";
-import toast from "react-hot-toast";
+import { toast } from "@heroui/react";
 import type { Record as RecordType } from "@classified/shared";
 
 interface ConfirmDeleteProps {
@@ -27,7 +27,7 @@ export default function ConfirmDelete({ isOpen, onClose, record }: ConfirmDelete
       toast.success("Record deleted");
       onClose();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to delete record");
+      toast.danger(err instanceof Error ? err.message : "Failed to delete record");
     }
   };
 
