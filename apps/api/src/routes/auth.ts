@@ -17,11 +17,7 @@ import {
   generatePasswordResetToken,
   generateTwoFactorToken,
 } from "@/lib/tokens.js";
-import {
-  sendVerificationEmail,
-  sendPasswordResetEmail,
-  sendTwoFactorEmail,
-} from "@/lib/mail.js";
+import { sendVerificationEmail, sendPasswordResetEmail, sendTwoFactorEmail } from "@/lib/mail.js";
 
 const auth = new Hono();
 
@@ -351,7 +347,14 @@ auth.post("/google", async (c) => {
     return c.json({ error: "Failed to exchange Google auth code" }, 400);
   }
 
-  const tokenData = await tokenRes.json();
+  const tokenData = (await tokenRes.json()) as {
+    access_token: string;
+    refresh_token?: string;
+    expires_in?: number;
+    token_type?: string;
+    id_token?: string;
+    scope?: string;
+  };
 
   const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
     headers: { Authorization: `Bearer ${tokenData.access_token}` },
@@ -399,9 +402,7 @@ auth.post("/google", async (c) => {
       providerAccountId: googleUser.id,
       accessToken: tokenData.access_token,
       refreshToken: tokenData.refresh_token,
-      expiresAt: tokenData.expires_in
-        ? Math.floor(Date.now() / 1000) + tokenData.expires_in
-        : null,
+      expiresAt: tokenData.expires_in ? Math.floor(Date.now() / 1000) + tokenData.expires_in : null,
       tokenType: tokenData.token_type,
       idToken: tokenData.id_token,
       scope: tokenData.scope,
@@ -444,7 +445,12 @@ auth.post("/github", async (c) => {
     return c.json({ error: "Failed to exchange GitHub auth code" }, 400);
   }
 
-  const tokenData = await tokenRes.json();
+  const tokenData = (await tokenRes.json()) as {
+    access_token?: string;
+    token_type?: string;
+    scope?: string;
+    error?: string;
+  };
 
   if (tokenData.error) {
     return c.json({ error: "GitHub auth failed" }, 400);
