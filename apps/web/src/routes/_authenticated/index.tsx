@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button, Input, Pagination, Skeleton } from "@heroui/react";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { FaPlus, FaSearch } from "react-icons/fa";
 import { useRecords } from "@/hooks/use-records";
 import RecordCard from "@/components/record-card";
@@ -95,7 +96,44 @@ function Dashboard() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center">
-          <Pagination total={totalPages} page={page} onChange={setPage} />
+          <Pagination>
+            <Pagination.Content>
+              <Pagination.Item>
+                <Pagination.Previous onPress={() => setPage((p) => Math.max(1, p - 1))} isDisabled={page === 1}>
+                  <FaChevronLeft size={12} />
+                </Pagination.Previous>
+              </Pagination.Item>
+              {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                let p: number;
+                if (totalPages <= 7) {
+                  p = i + 1;
+                } else if (page <= 4) {
+                  p = i + 1;
+                } else if (page >= totalPages - 3) {
+                  p = totalPages - 6 + i;
+                } else {
+                  p = page - 3 + i;
+                }
+                return (
+                  <Pagination.Item key={p}>
+                    <Pagination.Link isActive={p === page} onPress={() => setPage(p)}>
+                      {p}
+                    </Pagination.Link>
+                  </Pagination.Item>
+                );
+              })}
+              {totalPages > 7 && page < totalPages - 3 && (
+                <Pagination.Item>
+                  <Pagination.Ellipsis />
+                </Pagination.Item>
+              )}
+              <Pagination.Item>
+                <Pagination.Next onPress={() => setPage((p) => Math.min(totalPages, p + 1))} isDisabled={page === totalPages}>
+                  <FaChevronRight size={12} />
+                </Pagination.Next>
+              </Pagination.Item>
+            </Pagination.Content>
+          </Pagination>
         </div>
       )}
 
