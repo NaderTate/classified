@@ -2,10 +2,10 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { serve } from "@hono/node-server";
+import { authRoutes } from "@/routes/auth.js";
 
 const app = new Hono();
 
-// Middleware
 app.use("*", logger());
 app.use(
   "*",
@@ -17,10 +17,10 @@ app.use(
   }),
 );
 
-// Health check
 app.get("/health", (c) => c.json({ status: "ok" }));
 
-// Dev server
+app.route("/auth", authRoutes);
+
 if (process.env.NODE_ENV !== "production") {
   const port = parseInt(process.env.PORT || "3001", 10);
   console.log(`API server running on http://localhost:${port}`);
