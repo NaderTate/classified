@@ -8,10 +8,12 @@ export default function ThemeSwitch() {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", isDark);
     document.documentElement.classList.toggle("light", !isDark);
+    document.body.classList.toggle("dark", isDark);
+    document.body.classList.toggle("light", !isDark);
   }, [isDark]);
 
   return (
-    <Button isIconOnly size="sm" variant="ghost" onPress={() => setIsDark(!isDark)}>
+    <Button isIconOnly size="sm" variant="outline" onPress={() => setIsDark(!isDark)}>
       {isDark ? <FaSun /> : <FaMoon />}
     </Button>
   );

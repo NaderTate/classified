@@ -1,4 +1,4 @@
-import { Button, Avatar } from "@heroui/react";
+import { Button } from "@heroui/react";
 import { useState } from "react";
 import { FaCog } from "react-icons/fa";
 import { useAuth } from "@/hooks/use-auth";
@@ -13,23 +13,23 @@ export default function Header() {
 
   return (
     <>
-      <header className="border-b border-divider px-4 py-3 flex items-center justify-between">
+      <header className="border-b border-border px-4 py-3 flex items-center justify-between">
         <h1 className="text-xl font-bold">Classified</h1>
         <div className="flex items-center gap-2">
           <ThemeSwitch />
-          <Button isIconOnly size="sm" variant="ghost" onPress={() => setShowSettings(true)}>
+          <Button isIconOnly size="sm" variant="outline" onPress={() => setShowSettings(true)}>
             <FaCog />
           </Button>
           {user && (
-            <Avatar size="sm">
+            <div className="w-8 h-8 rounded-full bg-default flex items-center justify-center text-sm font-medium">
               {user.image ? (
-                <Avatar.Image src={user.image} />
+                <img src={user.image} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
               ) : (
-                <Avatar.Fallback>{user.name.charAt(0).toUpperCase()}</Avatar.Fallback>
+                user.name.charAt(0).toUpperCase()
               )}
-            </Avatar>
+            </div>
           )}
-          <Button size="sm" variant="ghost" onPress={() => logout()}>
+          <Button size="sm" variant="outline" onPress={() => logout()}>
             Logout
           </Button>
         </div>

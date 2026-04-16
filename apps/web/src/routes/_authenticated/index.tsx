@@ -76,9 +76,9 @@ function Dashboard() {
 
       {/* Records Grid */}
       {isLoading ? (
-        <div className="grid gap-3">
+        <div className="flex flex-wrap gap-5">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 rounded-lg" />
+            <Skeleton key={i} className="h-52 w-full max-w-[420px] rounded-lg" />
           ))}
         </div>
       ) : data?.records.length === 0 ? (
@@ -88,7 +88,7 @@ function Dashboard() {
             : "No records yet. Add your first one!"}
         </div>
       ) : (
-        <div className="grid gap-3">
+        <div className="flex flex-wrap gap-5">
           {data?.records.map((record) => (
             <RecordCard
               key={record.id}
