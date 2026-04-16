@@ -1,4 +1,4 @@
-import { View, Alert, Pressable, Image, Modal, ScrollView, Text, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Alert, Pressable, Image, Modal, ScrollView, Text, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity, StyleSheet, InteractionManager } from "react-native";
 import { useToast } from "heroui-native";
 import { useState, useEffect, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -31,12 +31,23 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
   const [icon, setIcon] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [ready, setReady] = useState(false);
   const { toast } = useToast();
   const insets = useSafeAreaInsets();
 
   const createRecord = useCreateRecord();
   const updateRecord = useUpdateRecord();
   const isEditing = !!record;
+
+  useEffect(() => {
+    if (isOpen) {
+      // Wait for modal fade animation to finish before rendering content
+      const task = InteractionManager.runAfterInteractions(() => setReady(true));
+      return () => task.cancel();
+    } else {
+      setReady(false);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -136,7 +147,7 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
         {/* Handle */}
         <View style={{ alignSelf: "center", width: 40, height: 4, borderRadius: 2, backgroundColor: "#3f3f46", marginBottom: 12 }} />
 
-        {/* Header */}
+        {/* Header — always render for instant visual */}
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, marginBottom: 16 }}>
           <Text style={{ color: "#fff", fontSize: 18, fontWeight: "bold" }}>
             {isEditing ? "Edit Record" : "New Record"}
@@ -146,6 +157,7 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
           </Pressable>
         </View>
 
+        {ready ? (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
           <ScrollView
             contentContainerStyle={{ paddingHorizontal: 20, gap: 10, paddingBottom: 16 }}
@@ -194,6 +206,9 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
+        ) : (
+          <View style={{ height: 300 }} />
+        )}
       </View>
     </Modal>
   );
