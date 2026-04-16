@@ -1,4 +1,4 @@
-import { Button, Input, Modal, toast, useOverlayState } from "@heroui/react";
+import { Button, Input, Modal, toast } from "@heroui/react";
 import { useState, useEffect } from "react";
 import { useUser, useUpdateSettings } from "@/hooks/use-user";
 
@@ -16,13 +16,6 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(false);
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-
-  const state = useOverlayState({
-    isOpen,
-    onOpenChange: (open) => {
-      if (!open) onClose();
-    },
-  });
 
   useEffect(() => {
     if (user && isOpen) {
@@ -61,10 +54,12 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Modal state={state}>
-      <Modal.Backdrop />
-      <Modal.Container size="lg">
+    <Modal defaultOpen onOpenChange={(open) => !open && onClose()}>
+      <Modal.Backdrop>
+        <Modal.Container size="lg">
         <Modal.Dialog>
           <Modal.CloseTrigger />
           <Modal.Header>
@@ -118,7 +113,8 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             </Button>
           </Modal.Footer>
         </Modal.Dialog>
-      </Modal.Container>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

@@ -1,8 +1,7 @@
-import { Modal, Button, Input, useOverlayState } from "@heroui/react";
+import { Modal, Button, Input, toast } from "@heroui/react";
 import { useState, useEffect } from "react";
 import { useCreateRecord, useUpdateRecord } from "@/hooks/use-records";
 import PasswordGenerator from "./password-generator";
-import { toast } from "@heroui/react";
 import type { Record as RecordType } from "@classified/shared";
 
 interface RecordFormProps {
@@ -22,13 +21,6 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
   const createRecord = useCreateRecord();
   const updateRecord = useUpdateRecord();
   const isEditing = !!record;
-
-  const state = useOverlayState({
-    isOpen,
-    onOpenChange: (open) => {
-      if (!open) onClose();
-    },
-  });
 
   useEffect(() => {
     if (record) {
@@ -72,11 +64,14 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
 
   const isLoading = createRecord.isPending || updateRecord.isPending;
 
+  if (!isOpen) return null;
+
   return (
-    <Modal state={state}>
-      <Modal.Backdrop />
-      <Modal.Container size="lg">
+    <Modal defaultOpen onOpenChange={(open) => !open && onClose()}>
+      <Modal.Backdrop>
+        <Modal.Container size="lg">
         <Modal.Dialog>
+          <Modal.CloseTrigger />
           <Modal.Header>
             <Modal.Heading>{isEditing ? "Edit Record" : "Add Record"}</Modal.Heading>
           </Modal.Header>
@@ -112,7 +107,7 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
             </label>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="ghost" onPress={onClose}>
+            <Button slot="close" variant="outline">
               Cancel
             </Button>
             <Button variant="primary" onPress={handleSubmit} isDisabled={isLoading}>
@@ -120,7 +115,8 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
             </Button>
           </Modal.Footer>
         </Modal.Dialog>
-      </Modal.Container>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

@@ -1,6 +1,5 @@
-import { Modal, Button, useOverlayState } from "@heroui/react";
+import { Modal, Button, toast } from "@heroui/react";
 import { useDeleteRecord } from "@/hooks/use-records";
-import { toast } from "@heroui/react";
 import type { Record as RecordType } from "@classified/shared";
 
 interface ConfirmDeleteProps {
@@ -11,13 +10,6 @@ interface ConfirmDeleteProps {
 
 export default function ConfirmDelete({ isOpen, onClose, record }: ConfirmDeleteProps) {
   const deleteRecord = useDeleteRecord();
-
-  const state = useOverlayState({
-    isOpen,
-    onOpenChange: (open) => {
-      if (!open) onClose();
-    },
-  });
 
   const handleDelete = async () => {
     if (!record) return;
@@ -31,11 +23,14 @@ export default function ConfirmDelete({ isOpen, onClose, record }: ConfirmDelete
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Modal state={state}>
-      <Modal.Backdrop />
-      <Modal.Container size="sm">
+    <Modal defaultOpen onOpenChange={(open) => !open && onClose()}>
+      <Modal.Backdrop>
+        <Modal.Container size="sm">
         <Modal.Dialog>
+          <Modal.CloseTrigger />
           <Modal.Header>
             <Modal.Heading>Delete Record</Modal.Heading>
           </Modal.Header>
@@ -46,7 +41,7 @@ export default function ConfirmDelete({ isOpen, onClose, record }: ConfirmDelete
             </p>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="ghost" onPress={onClose}>
+            <Button slot="close" variant="outline">
               Cancel
             </Button>
             <Button variant="danger" onPress={handleDelete} isDisabled={deleteRecord.isPending}>
@@ -54,7 +49,8 @@ export default function ConfirmDelete({ isOpen, onClose, record }: ConfirmDelete
             </Button>
           </Modal.Footer>
         </Modal.Dialog>
-      </Modal.Container>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }
