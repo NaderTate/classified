@@ -9,15 +9,15 @@ import {
   NewPasswordSchema,
   OAuthCodeSchema,
 } from "@classified/shared";
-import { prisma } from "@/lib/prisma.js";
-import { hashPassword, comparePassword } from "@/utils/password.js";
-import { signAccessToken, generateRefreshToken } from "@/lib/jwt.js";
+import { prisma } from "../lib/prisma";
+import { hashPassword, comparePassword } from "../utils/password";
+import { signAccessToken, generateRefreshToken } from "../lib/jwt";
 import {
   generateVerificationToken,
   generatePasswordResetToken,
   generateTwoFactorToken,
-} from "@/lib/tokens.js";
-import { sendVerificationEmail, sendPasswordResetEmail, sendTwoFactorEmail } from "@/lib/mail.js";
+} from "../lib/tokens";
+import { sendVerificationEmail, sendPasswordResetEmail, sendTwoFactorEmail } from "../lib/mail";
 
 const auth = new Hono();
 

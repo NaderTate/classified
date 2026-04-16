@@ -2,9 +2,9 @@ import { Hono, type Context, type Next } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { serve } from "@hono/node-server";
-import { authRoutes } from "@/routes/auth.js";
-import { recordsRoutes } from "@/routes/records.js";
-import { userRoutes } from "@/routes/user.js";
+import { authRoutes } from "./routes/auth";
+import { recordsRoutes } from "./routes/records";
+import { userRoutes } from "./routes/user";
 
 function createRateLimiter(windowMs: number, maxRequests: number) {
   const requests = new Map<string, { count: number; resetAt: number }>();

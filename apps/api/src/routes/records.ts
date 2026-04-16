@@ -1,9 +1,9 @@
 import { Hono } from "hono";
 import { CreateRecordSchema, UpdateRecordSchema, RecordQuerySchema } from "@classified/shared";
-import { prisma } from "@/lib/prisma.js";
-import { encrypt, decrypt } from "@/lib/encryption.js";
-import { authMiddleware } from "@/middleware/auth.js";
-import { ownershipMiddleware } from "@/middleware/ownership.js";
+import { prisma } from "../lib/prisma";
+import { encrypt, decrypt } from "../lib/encryption";
+import { authMiddleware } from "../middleware/auth";
+import { ownershipMiddleware } from "../middleware/ownership";
 import type { Record as PrismaRecord } from "@prisma/client";
 
 const records = new Hono();

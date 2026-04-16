@@ -1,10 +1,10 @@
 import { Hono } from "hono";
 import { UpdateSettingsSchema } from "@classified/shared";
-import { prisma } from "@/lib/prisma.js";
-import { authMiddleware } from "@/middleware/auth.js";
-import { hashPassword, comparePassword } from "@/utils/password.js";
-import { generateVerificationToken } from "@/lib/tokens.js";
-import { sendVerificationEmail } from "@/lib/mail.js";
+import { prisma } from "../lib/prisma";
+import { authMiddleware } from "../middleware/auth";
+import { hashPassword, comparePassword } from "../utils/password";
+import { generateVerificationToken } from "../lib/tokens";
+import { sendVerificationEmail } from "../lib/mail";
 
 const user = new Hono();
 

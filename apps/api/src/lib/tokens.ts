@@ -1,6 +1,6 @@
 import { randomBytes, randomInt } from "node:crypto";
-import { hashPassword } from "@/utils/password.js";
-import { prisma } from "./prisma.js";
+import { hashPassword } from "../utils/password";
+import { prisma } from "./prisma";
 
 async function hashToken(token: string): Promise<string> {
   return hashPassword(token);
