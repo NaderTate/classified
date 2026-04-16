@@ -24,7 +24,7 @@ export default function RecordCard({ record, onEdit, onDelete }: RecordCardProps
   };
 
   return (
-    <Card className="w-full max-w-[420px]">
+    <Card className="w-full ">
       <Card.Content className="p-5 space-y-4">
         {/* Header: icon + site + menu */}
         <div className="flex items-center gap-4">

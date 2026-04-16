@@ -21,9 +21,17 @@ export default function Header() {
             <FaCog />
           </Button>
           {user && (
-            <div className="w-8 h-8 rounded-full bg-default flex items-center justify-center text-sm font-medium">
+            <div className="w-8 h-8 rounded-full bg-default flex items-center justify-center text-sm font-medium overflow-hidden">
               {user.image ? (
-                <img src={user.image} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
+                <img
+                  src={user.image}
+                  alt={user.name}
+                  className="w-8 h-8 rounded-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                    e.currentTarget.parentElement!.textContent = user.name.charAt(0).toUpperCase();
+                  }}
+                />
               ) : (
                 user.name.charAt(0).toUpperCase()
               )}
