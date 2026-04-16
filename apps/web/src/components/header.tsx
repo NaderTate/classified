@@ -7,7 +7,7 @@ export default function Header() {
   return (
     <header className="border-b border-divider px-4 py-3 flex items-center justify-between">
       <h1 className="text-xl font-bold">Classified</h1>
-      <Button size="sm" variant="flat" onPress={() => logout()}>
+      <Button size="sm" variant="ghost" onPress={() => logout()}>
         Logout
       </Button>
     </header>

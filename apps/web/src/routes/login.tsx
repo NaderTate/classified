@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Button, Input, Card, CardBody, CardHeader, Divider } from "@heroui/react";
+import { Button, Card, Input, Separator, Spinner } from "@heroui/react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { api, tokenStore } from "@/lib/api-client";
+import { api } from "@/lib/api-client";
 import toast from "react-hot-toast";
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import type { LoginResponse } from "@classified/shared";
@@ -76,13 +76,11 @@ function LoginPage() {
   if (oauthCode && !isLoading) {
     setIsLoading(true);
     const redirectUri = `${window.location.origin}/login`;
-    // Detect provider from URL (GitHub includes state param pattern)
     const isGithub = !searchParams.has("scope");
     const handler = isGithub ? api.auth.github : api.auth.google;
     handler({ code: oauthCode, redirectUri })
       .then((tokens) => {
         loginWithTokens(tokens);
-        // Clean URL
         window.history.replaceState({}, "", "/login");
         navigate({ to: "/" });
       })
@@ -96,79 +94,81 @@ function LoginPage() {
   return (
     <div className="flex items-center justify-center min-h-screen px-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="flex flex-col gap-1 items-center pb-0">
+        <Card.Header className="flex flex-col gap-1 items-center pb-0">
           <h1 className="text-2xl font-bold">Welcome Back</h1>
           <p className="text-default-500 text-sm">Sign in to Classified</p>
-        </CardHeader>
-        <CardBody className="gap-4">
+        </Card.Header>
+        <Card.Content className="flex flex-col gap-4">
           {showTwoFactor ? (
             <form onSubmit={handleTwoFactor} className="flex flex-col gap-4">
               <p className="text-sm text-default-500 text-center">
                 Enter the 6-digit code sent to your email
               </p>
-              <Input
-                label="Verification Code"
-                value={code}
-                onValueChange={setCode}
-                maxLength={6}
-                autoFocus
-              />
-              <Button type="submit" color="primary" isLoading={isLoading} fullWidth>
-                Verify
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium">Verification Code</span>
+                <Input
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  maxLength={6}
+                  autoFocus
+                />
+              </label>
+              <Button type="submit" variant="primary" fullWidth isDisabled={isLoading}>
+                {isLoading ? <Spinner size="sm" /> : "Verify"}
               </Button>
-              <Button
-                variant="light"
-                size="sm"
-                onPress={() => setShowTwoFactor(false)}
-              >
+              <Button variant="ghost" size="sm" onPress={() => setShowTwoFactor(false)}>
                 Back to login
               </Button>
             </form>
           ) : (
             <>
               <form onSubmit={handleLogin} className="flex flex-col gap-4">
-                <Input
-                  label="Email"
-                  type="email"
-                  value={email}
-                  onValueChange={setEmail}
-                  isRequired
-                  autoFocus
-                />
-                <Input
-                  label="Password"
-                  type="password"
-                  value={password}
-                  onValueChange={setPassword}
-                  isRequired
-                />
+                <label className="flex flex-col gap-1">
+                  <span className="text-sm font-medium">Email</span>
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    autoFocus
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-sm font-medium">Password</span>
+                  <Input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </label>
                 <div className="flex justify-end">
                   <a href="/reset-password" className="text-sm text-primary">
                     Forgot password?
                   </a>
                 </div>
-                <Button type="submit" color="primary" isLoading={isLoading} fullWidth>
-                  Sign In
+                <Button type="submit" variant="primary" fullWidth isDisabled={isLoading}>
+                  {isLoading ? <Spinner size="sm" /> : "Sign In"}
                 </Button>
               </form>
 
-              <Divider />
+              <Separator />
 
               <div className="flex gap-2">
                 <Button
-                  variant="bordered"
+                  variant="outline"
                   fullWidth
-                  startContent={<FaGoogle />}
                   onPress={() => handleOAuth("google")}
                 >
+                  <FaGoogle />
                   Google
                 </Button>
                 <Button
-                  variant="bordered"
+                  variant="outline"
                   fullWidth
-                  startContent={<FaGithub />}
                   onPress={() => handleOAuth("github")}
                 >
+                  <FaGithub />
                   GitHub
                 </Button>
               </div>
@@ -181,7 +181,7 @@ function LoginPage() {
               </p>
             </>
           )}
-        </CardBody>
+        </Card.Content>
       </Card>
     </div>
   );

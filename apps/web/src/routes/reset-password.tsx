@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Button, Input, Card, CardBody, CardHeader } from "@heroui/react";
+import { Button, Card, Input, Spinner } from "@heroui/react";
 import { useState } from "react";
 import { api } from "@/lib/api-client";
 import toast from "react-hot-toast";
@@ -30,10 +30,10 @@ function ResetPasswordPage() {
   return (
     <div className="flex items-center justify-center min-h-screen px-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="flex flex-col gap-1 items-center pb-0">
+        <Card.Header className="flex flex-col gap-1 items-center pb-0">
           <h1 className="text-2xl font-bold">Reset Password</h1>
-        </CardHeader>
-        <CardBody>
+        </Card.Header>
+        <Card.Content>
           {sent ? (
             <div className="text-center flex flex-col gap-4">
               <p className="text-default-500">
@@ -45,23 +45,25 @@ function ResetPasswordPage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <Input
-                label="Email"
-                type="email"
-                value={email}
-                onValueChange={setEmail}
-                isRequired
-                autoFocus
-              />
-              <Button type="submit" color="primary" isLoading={isLoading} fullWidth>
-                Send Reset Link
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium">Email</span>
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoFocus
+                />
+              </label>
+              <Button type="submit" variant="primary" fullWidth isDisabled={isLoading}>
+                {isLoading ? <Spinner size="sm" /> : "Send Reset Link"}
               </Button>
               <a href="/login" className="text-center text-sm text-primary">
                 Back to login
               </a>
             </form>
           )}
-        </CardBody>
+        </Card.Content>
       </Card>
     </div>
   );

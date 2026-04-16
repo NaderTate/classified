@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Card, CardBody, Spinner } from "@heroui/react";
+import { Card, Spinner } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api-client";
 
@@ -36,7 +36,7 @@ function VerifyEmailPage() {
   return (
     <div className="flex items-center justify-center min-h-screen px-4">
       <Card className="w-full max-w-md text-center">
-        <CardBody className="gap-4 items-center py-8">
+        <Card.Content className="flex flex-col gap-4 items-center py-8">
           {status === "loading" && <Spinner size="lg" />}
           {status === "success" && (
             <>
@@ -54,7 +54,7 @@ function VerifyEmailPage() {
               </a>
             </>
           )}
-        </CardBody>
+        </Card.Content>
       </Card>
     </div>
   );

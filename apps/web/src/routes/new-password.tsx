@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Button, Input, Card, CardBody, CardHeader } from "@heroui/react";
+import { Button, Card, Input, Spinner } from "@heroui/react";
 import { useState } from "react";
 import { api } from "@/lib/api-client";
 import toast from "react-hot-toast";
@@ -39,28 +39,30 @@ function NewPasswordPage() {
   return (
     <div className="flex items-center justify-center min-h-screen px-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="flex flex-col gap-1 items-center pb-0">
+        <Card.Header className="flex flex-col gap-1 items-center pb-0">
           <h1 className="text-2xl font-bold">New Password</h1>
-        </CardHeader>
-        <CardBody>
+        </Card.Header>
+        <Card.Content>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <Input
-              label="New Password"
-              type="password"
-              value={password}
-              onValueChange={setPassword}
-              isRequired
-              description="Minimum 6 characters"
-              autoFocus
-            />
-            <Button type="submit" color="primary" isLoading={isLoading} fullWidth>
-              Reset Password
+            <label className="flex flex-col gap-1">
+              <span className="text-sm font-medium">New Password</span>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoFocus
+              />
+              <span className="text-xs text-default-400">Minimum 6 characters</span>
+            </label>
+            <Button type="submit" variant="primary" fullWidth isDisabled={isLoading}>
+              {isLoading ? <Spinner size="sm" /> : "Reset Password"}
             </Button>
             <a href="/login" className="text-center text-sm text-primary">
               Back to login
             </a>
           </form>
-        </CardBody>
+        </Card.Content>
       </Card>
     </div>
   );
