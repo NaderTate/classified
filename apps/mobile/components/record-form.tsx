@@ -94,7 +94,12 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
             </TextField>
             <TextField>
               <Label>Password</Label>
-              <Input placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry />
+              <Input
+                placeholder="Password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
             </TextField>
             <Button size="sm" variant="ghost" onPress={() => setShowGenerator(!showGenerator)}>
               <Button.Label>{showGenerator ? "Hide" : "Generate"} Password</Button.Label>

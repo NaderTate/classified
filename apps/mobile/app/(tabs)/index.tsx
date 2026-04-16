@@ -78,14 +78,20 @@ export default function RecordsScreen() {
             )}
             contentContainerStyle={{ gap: 8, paddingBottom: 24 }}
             refreshControl={
-              <RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} tintColor="#3b82f6" />
+              <RefreshControl
+                refreshing={isRefetching}
+                onRefresh={() => refetch()}
+                tintColor="#3b82f6"
+              />
             }
             onEndReached={handleEndReached}
             onEndReachedThreshold={0.5}
             ListEmptyComponent={
               <View style={{ alignItems: "center", paddingTop: 48 }}>
                 <Text style={{ color: "#71717a" }}>
-                  {debouncedSearch ? "No records match your search." : "No records yet. Tap + to add one!"}
+                  {debouncedSearch
+                    ? "No records match your search."
+                    : "No records yet. Tap + to add one!"}
                 </Text>
               </View>
             }

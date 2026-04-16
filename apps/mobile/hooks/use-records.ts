@@ -28,7 +28,8 @@ export function useCreateRecord() {
 export function useUpdateRecord() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateRecordInput }) => api.records.update(id, data),
+    mutationFn: ({ id, data }: { id: string; data: UpdateRecordInput }) =>
+      api.records.update(id, data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["records"] }),
   });
 }

@@ -31,7 +31,8 @@ export default function SettingsScreen() {
 
     if (name !== user?.name) data.name = name;
     if (email !== user?.email) data.email = email;
-    if (isTwoFactorEnabled !== user?.isTwoFactorEnabled) data.isTwoFactorEnabled = isTwoFactorEnabled;
+    if (isTwoFactorEnabled !== user?.isTwoFactorEnabled)
+      data.isTwoFactorEnabled = isTwoFactorEnabled;
     if (password && newPassword) {
       data.password = password;
       data.newPassword = newPassword;
@@ -102,7 +103,13 @@ export default function SettingsScreen() {
             <Card.Title>Security</Card.Title>
           </Card.Header>
           <Card.Body style={{ gap: 16 }}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <Text style={{ color: "#fff" }}>Two-Factor Authentication</Text>
               <Switch isSelected={isTwoFactorEnabled} onSelectedChange={setIsTwoFactorEnabled} />
             </View>

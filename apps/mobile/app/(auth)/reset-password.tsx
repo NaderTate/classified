@@ -17,7 +17,11 @@ export default function ResetPasswordScreen() {
 
     try {
       await api.auth.resetPassword({ email });
-      toast.show({ variant: "success", label: "Email Sent", description: "Check your inbox for a reset link" });
+      toast.show({
+        variant: "success",
+        label: "Email Sent",
+        description: "Check your inbox for a reset link",
+      });
       router.back();
     } catch (err) {
       Alert.alert("Error", err instanceof Error ? err.message : "Something went wrong");

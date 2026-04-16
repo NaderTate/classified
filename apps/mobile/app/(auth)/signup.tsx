@@ -41,7 +41,12 @@ export default function SignupScreen() {
         <Card.Body style={{ gap: 16 }}>
           <TextField>
             <Label>Name</Label>
-            <Input placeholder="Your name" value={name} onChangeText={setName} textContentType="name" />
+            <Input
+              placeholder="Your name"
+              value={name}
+              onChangeText={setName}
+              textContentType="name"
+            />
           </TextField>
 
           <TextField>

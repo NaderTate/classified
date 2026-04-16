@@ -19,18 +19,26 @@ export default function VerifyEmailScreen() {
 
     api.auth
       .verifyEmail({ token })
-      .then((res) => {
+      .then((res: { success: string }) => {
         setStatus("success");
         setMessage(res.success);
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         setStatus("error");
         setMessage(err instanceof Error ? err.message : "Verification failed");
       });
   }, [token]);
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 24, backgroundColor: "#000" }}>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 24,
+        backgroundColor: "#000",
+      }}
+    >
       {status === "loading" && <ActivityIndicator size="large" color="#3b82f6" />}
       {status === "success" && (
         <>

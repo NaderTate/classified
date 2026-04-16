@@ -19,7 +19,11 @@ export default function RecordCard({ record, onEdit, onDelete }: RecordCardProps
     if (record.password) {
       await Clipboard.setStringAsync(record.password);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      toast.show({ variant: "success", label: "Copied!", description: "Password copied to clipboard" });
+      toast.show({
+        variant: "success",
+        label: "Copied!",
+        description: "Password copied to clipboard",
+      });
     }
   };
 
