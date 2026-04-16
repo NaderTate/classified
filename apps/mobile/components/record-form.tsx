@@ -1,5 +1,5 @@
-import { View, Alert, Pressable, Image, Modal, ScrollView, Text, KeyboardAvoidingView, Platform } from "react-native";
-import { Button, Input, InputGroup, useToast } from "heroui-native";
+import { View, Alert, Pressable, Image, Modal, ScrollView, Text, TextInput, KeyboardAvoidingView, Platform, TouchableOpacity, StyleSheet } from "react-native";
+import { useToast } from "heroui-native";
 import { useState, useEffect, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -39,20 +39,22 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
   const isEditing = !!record;
 
   useEffect(() => {
-    if (record) {
-      setSite(record.site || "");
-      setEmail(record.email || "");
-      setUsername(record.username || "");
-      setPassword(record.password || "");
-      setIcon(record.icon || "");
-    } else {
-      setSite("");
-      setEmail("");
-      setUsername("");
-      setPassword("");
-      setIcon("");
+    if (isOpen) {
+      if (record) {
+        setSite(record.site || "");
+        setEmail(record.email || "");
+        setUsername(record.username || "");
+        setPassword(record.password || "");
+        setIcon(record.icon || "");
+      } else {
+        setSite("");
+        setEmail("");
+        setUsername("");
+        setPassword("");
+        setIcon("");
+      }
+      setShowPassword(false);
     }
-    setShowPassword(false);
   }, [record, isOpen]);
 
   const handlePickImage = useCallback(async () => {
@@ -62,7 +64,6 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
       aspect: [1, 1],
       quality: 0.8,
     });
-
     if (result.canceled || !result.assets?.[0]) return;
 
     setIsUploading(true);
@@ -80,7 +81,6 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
         method: "POST",
         body: formData,
       });
-
       if (!res.ok) throw new Error("Upload failed");
       const data = await res.json();
       setIcon(data.secure_url || data.url);
@@ -100,7 +100,6 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
       password: password || undefined,
       icon: icon || undefined,
     };
-
     try {
       if (isEditing && record) {
         await updateRecord.mutateAsync({ id: record.id, data });
@@ -117,106 +116,115 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
 
   const isPending = createRecord.isPending || updateRecord.isPending;
 
-  return (
-    <Modal visible={isOpen} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
-      {/* Backdrop */}
-      <Pressable style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.65)" }} onPress={onClose} />
+  if (!isOpen) return null;
 
-      {/* Bottom card */}
+  return (
+    <Modal visible transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
+      <Pressable style={s.backdrop} onPress={onClose} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "#18181b",
-          borderTopLeftRadius: 24,
-          borderTopRightRadius: 24,
-          paddingTop: 16,
-          paddingBottom: insets.bottom + 16,
-          maxHeight: "80%",
-        }}
+        style={[s.card, { paddingBottom: insets.bottom + 16 }]}
       >
-        {/* Handle bar */}
-        <View style={{ alignSelf: "center", width: 40, height: 4, borderRadius: 2, backgroundColor: "#3f3f46", marginBottom: 12 }} />
+        {/* Handle */}
+        <View style={s.handle} />
 
         {/* Header */}
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, marginBottom: 16 }}>
-          <Text style={{ color: "#fff", fontSize: 18, fontWeight: "bold" }}>
-            {isEditing ? "Edit Record" : "New Record"}
-          </Text>
+        <View style={s.header}>
+          <Text style={s.title}>{isEditing ? "Edit Record" : "New Record"}</Text>
           <Pressable hitSlop={8} onPress={onClose}>
             <Ionicons name="close" size={22} color="#a1a1aa" />
           </Pressable>
         </View>
 
-        <ScrollView
-          contentContainerStyle={{ paddingHorizontal: 20, gap: 10, paddingBottom: 16 }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Icon picker */}
-          <Pressable
-            onPress={handlePickImage}
-            style={{
-              alignSelf: "center",
-              marginBottom: 8,
-              width: 64,
-              height: 64,
-              borderRadius: 14,
-              backgroundColor: "#27272a",
-              justifyContent: "center",
-              alignItems: "center",
-              overflow: "hidden",
-            }}
-          >
+        <ScrollView contentContainerStyle={s.form} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          {/* Icon */}
+          <Pressable onPress={handlePickImage} style={s.iconPicker}>
             {icon ? (
-              <Image source={{ uri: icon }} style={{ width: 64, height: 64, borderRadius: 14 }} />
-            ) : isUploading ? (
-              <Ionicons name="cloud-upload" size={24} color="#3b82f6" />
+              <Image source={{ uri: icon }} style={s.iconImage} />
             ) : (
-              <Ionicons name="camera" size={24} color="#71717a" />
+              <Ionicons name={isUploading ? "cloud-upload" : "camera"} size={24} color={isUploading ? "#3b82f6" : "#71717a"} />
             )}
           </Pressable>
 
-          {/* Form */}
-          <Input variant="secondary" placeholder="Site / Service" value={site} onChangeText={setSite} />
-          <Input variant="secondary" placeholder="Username" value={username} onChangeText={setUsername} />
-          <Input variant="secondary" placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
-          <InputGroup>
-            <InputGroup.Input
-              variant="secondary"
+          <TextInput style={s.input} placeholder="Site / Service" placeholderTextColor="#52525b" value={site} onChangeText={setSite} />
+          <TextInput style={s.input} placeholder="Username" placeholderTextColor="#52525b" value={username} onChangeText={setUsername} />
+          <TextInput style={s.input} placeholder="Email" placeholderTextColor="#52525b" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+
+          {/* Password with inline icons */}
+          <View style={s.passwordRow}>
+            <TextInput
+              style={[s.input, { flex: 1, marginBottom: 0 }]}
               placeholder="Password"
+              placeholderTextColor="#52525b"
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
             />
-            <InputGroup.Suffix style={{ gap: 8, flexDirection: "row", alignItems: "center", paddingRight: 8 }}>
-              <Pressable onPress={() => setShowPassword(!showPassword)}>
-                <Ionicons name={showPassword ? "eye" : "eye-off"} size={18} color={showPassword ? "#3b82f6" : "#71717a"} />
-              </Pressable>
-              <Pressable onPress={() => { setPassword(generatePassword()); setShowPassword(true); }}>
-                <Ionicons name="refresh" size={18} color="#71717a" />
-              </Pressable>
-            </InputGroup.Suffix>
-          </InputGroup>
+            <Pressable onPress={() => setShowPassword(!showPassword)} style={s.passIcon}>
+              <Ionicons name={showPassword ? "eye" : "eye-off"} size={18} color={showPassword ? "#3b82f6" : "#71717a"} />
+            </Pressable>
+            <Pressable onPress={() => { setPassword(generatePassword()); setShowPassword(true); }} style={s.passIcon}>
+              <Ionicons name="refresh" size={18} color="#71717a" />
+            </Pressable>
+          </View>
 
-          {/* Actions */}
-          <View style={{ flexDirection: "row", gap: 12, marginTop: 8 }}>
-            <View style={{ flex: 1 }}>
-              <Button variant="outline" onPress={onClose}>
-                <Button.Label>Cancel</Button.Label>
-              </Button>
-            </View>
-            <View style={{ flex: 1 }}>
-              <Button variant="primary" onPress={handleSave} isDisabled={isPending}>
-                <Button.Label>{isPending ? "Saving..." : isEditing ? "Save" : "Create"}</Button.Label>
-              </Button>
-            </View>
+          {/* Buttons */}
+          <View style={s.buttons}>
+            <TouchableOpacity style={s.cancelBtn} onPress={onClose} activeOpacity={0.7}>
+              <Text style={s.cancelText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[s.saveBtn, isPending && { opacity: 0.5 }]} onPress={handleSave} disabled={isPending} activeOpacity={0.7}>
+              <Text style={s.saveText}>{isPending ? "Saving..." : isEditing ? "Save" : "Create"}</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </Modal>
   );
 }
+
+const s = StyleSheet.create({
+  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.65)" },
+  card: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "#18181b",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: 12,
+    maxHeight: "80%",
+  },
+  handle: { alignSelf: "center", width: 40, height: 4, borderRadius: 2, backgroundColor: "#3f3f46", marginBottom: 12 },
+  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, marginBottom: 16 },
+  title: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+  form: { paddingHorizontal: 20, gap: 10, paddingBottom: 16 },
+  iconPicker: {
+    alignSelf: "center",
+    marginBottom: 4,
+    width: 60,
+    height: 60,
+    borderRadius: 14,
+    backgroundColor: "#27272a",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+  },
+  iconImage: { width: 60, height: 60, borderRadius: 14 },
+  input: {
+    backgroundColor: "#27272a",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    color: "#fff",
+    fontSize: 15,
+  },
+  passwordRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  passIcon: { padding: 10, backgroundColor: "#27272a", borderRadius: 10 },
+  buttons: { flexDirection: "row", gap: 12, marginTop: 8 },
+  cancelBtn: { flex: 1, paddingVertical: 14, borderRadius: 12, borderWidth: 1, borderColor: "#3f3f46", alignItems: "center" },
+  cancelText: { color: "#a1a1aa", fontSize: 15, fontWeight: "600" },
+  saveBtn: { flex: 1, paddingVertical: 14, borderRadius: 12, backgroundColor: "#3b82f6", alignItems: "center" },
+  saveText: { color: "#fff", fontSize: 15, fontWeight: "600" },
+});
