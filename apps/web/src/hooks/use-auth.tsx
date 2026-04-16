@@ -32,18 +32,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAuthenticated(true);
   }, []);
 
-  const login = useCallback(async (data: LoginInput): Promise<LoginResponse> => {
-    const response = await api.auth.login(data);
-    if ("accessToken" in response) {
-      loginWithTokens(response);
-    }
-    return response;
-  }, [loginWithTokens]);
+  const login = useCallback(
+    async (data: LoginInput): Promise<LoginResponse> => {
+      const response = await api.auth.login(data);
+      if ("accessToken" in response) {
+        loginWithTokens(response);
+      }
+      return response;
+    },
+    [loginWithTokens],
+  );
 
-  const loginWithTwoFactor = useCallback(async (data: TwoFactorInput) => {
-    const tokens = await api.auth.twoFactor(data);
-    loginWithTokens(tokens);
-  }, [loginWithTokens]);
+  const loginWithTwoFactor = useCallback(
+    async (data: TwoFactorInput) => {
+      const tokens = await api.auth.twoFactor(data);
+      loginWithTokens(tokens);
+    },
+    [loginWithTokens],
+  );
 
   const logout = useCallback(async () => {
     const rt = tokenStore.getRefreshToken();

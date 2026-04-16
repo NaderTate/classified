@@ -45,7 +45,12 @@ function SignupPage() {
             </label>
             <label className="flex flex-col gap-1">
               <span className="text-sm font-medium">Email</span>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </label>
             <label className="flex flex-col gap-1">
               <span className="text-sm font-medium">Password</span>

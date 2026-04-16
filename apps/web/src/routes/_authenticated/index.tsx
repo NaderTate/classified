@@ -83,7 +83,9 @@ function Dashboard() {
         </div>
       ) : data?.records.length === 0 ? (
         <div className="text-center py-12 text-default-500">
-          {debouncedSearch ? "No records match your search." : "No records yet. Add your first one!"}
+          {debouncedSearch
+            ? "No records match your search."
+            : "No records yet. Add your first one!"}
         </div>
       ) : (
         <div className="grid gap-3">

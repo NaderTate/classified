@@ -155,19 +155,11 @@ function LoginPage() {
               <Separator />
 
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  fullWidth
-                  onPress={() => handleOAuth("google")}
-                >
+                <Button variant="outline" fullWidth onPress={() => handleOAuth("google")}>
                   <FaGoogle />
                   Google
                 </Button>
-                <Button
-                  variant="outline"
-                  fullWidth
-                  onPress={() => handleOAuth("github")}
-                >
+                <Button variant="outline" fullWidth onPress={() => handleOAuth("github")}>
                   <FaGithub />
                   GitHub
                 </Button>
