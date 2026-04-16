@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Button, Card, Input, Spinner, toast } from "@heroui/react";
+import { Button, Card, Input, Spinner, TextField, Label, toast } from "@heroui/react";
 import { useState } from "react";
 import { api } from "@/lib/api-client";
 
@@ -44,8 +44,8 @@ function ResetPasswordPage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium">Email</span>
+              <TextField>
+                <Label>Email</Label>
                 <Input
                   type="email"
                   value={email}
@@ -53,7 +53,7 @@ function ResetPasswordPage() {
                   required
                   autoFocus
                 />
-              </label>
+              </TextField>
               <Button type="submit" variant="primary" fullWidth isDisabled={isLoading}>
                 {isLoading ? <Spinner size="sm" /> : "Send Reset Link"}
               </Button>

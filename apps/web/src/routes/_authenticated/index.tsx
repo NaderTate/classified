@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Button, Input, Pagination, Skeleton } from "@heroui/react";
+import { Button, Pagination, SearchField, Skeleton } from "@heroui/react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { FaPlus, FaSearch } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import { useRecords } from "@/hooks/use-records";
 import RecordCard from "@/components/record-card";
 import RecordForm from "@/components/record-form";
@@ -40,20 +40,13 @@ function Dashboard() {
     <div className="flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2 max-w-md flex-1">
-          <FaSearch className="text-default-400 shrink-0" />
-          <Input
-            placeholder="Search records..."
-            value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            className="flex-1"
-          />
-          {search && (
-            <Button size="sm" variant="ghost" onPress={() => handleSearchChange("")}>
-              ✕
-            </Button>
-          )}
-        </div>
+        <SearchField value={search} onChange={handleSearchChange} className="max-w-md flex-1">
+          <SearchField.Group>
+            <SearchField.SearchIcon />
+            <SearchField.Input placeholder="Search records..." />
+            <SearchField.ClearButton />
+          </SearchField.Group>
+        </SearchField>
         <Button variant="primary" onPress={() => setShowCreateForm(true)}>
           <FaPlus />
           Add Record

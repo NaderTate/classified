@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Button, Card, Input, Spinner, toast } from "@heroui/react";
+import { Button, Card, Input, Spinner, TextField, Label, toast } from "@heroui/react";
 import { useState } from "react";
 import { api } from "@/lib/api-client";
 
@@ -38,21 +38,21 @@ function SignupPage() {
         </Card.Header>
         <Card.Content>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium">Name</span>
+            <TextField>
+              <Label>Name</Label>
               <Input value={name} onChange={(e) => setName(e.target.value)} required autoFocus />
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium">Email</span>
+            </TextField>
+            <TextField>
+              <Label>Email</Label>
               <Input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium">Password</span>
+            </TextField>
+            <TextField>
+              <Label>Password</Label>
               <Input
                 type="password"
                 value={password}
@@ -60,7 +60,7 @@ function SignupPage() {
                 required
               />
               <span className="text-xs text-default-400">Minimum 6 characters</span>
-            </label>
+            </TextField>
             <Button type="submit" variant="primary" fullWidth isDisabled={isLoading}>
               {isLoading ? <Spinner size="sm" /> : "Sign Up"}
             </Button>

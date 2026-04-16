@@ -1,4 +1,4 @@
-import { Modal, Button, Input, toast } from "@heroui/react";
+import { Modal, Button, Input, InputGroup, TextField, Label, toast } from "@heroui/react";
 import { useState, useEffect, useCallback } from "react";
 import { FaEye, FaEyeSlash, FaSync, FaCloudUploadAlt, FaTimes } from "react-icons/fa";
 import { useCreateRecord, useUpdateRecord } from "@/hooks/use-records";
@@ -184,45 +184,47 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
                 </div>
               )}
 
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium">Site / Service</span>
+              <TextField>
+                <Label>Site / Service</Label>
                 <Input value={site} onChange={(e) => setSite(e.target.value)} autoFocus />
-              </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium">Username</span>
+              </TextField>
+              <TextField>
+                <Label>Username</Label>
                 <Input value={username} onChange={(e) => setUsername(e.target.value)} />
-              </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium">Email</span>
+              </TextField>
+              <TextField>
+                <Label>Email</Label>
                 <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-              </label>
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium">Password</span>
-                <div className="flex items-center gap-2">
-                  <Input
+              </TextField>
+              <TextField>
+                <Label>Password</Label>
+                <InputGroup>
+                  <InputGroup.Input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     autoComplete="new-password"
-                    className="flex-1"
+                    placeholder="Password"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className={`p-2 rounded-md transition-colors ${showPassword ? "text-primary" : "text-default-400"} hover:text-foreground`}
-                  >
-                    {showPassword ? <FaEye size={16} /> : <FaEyeSlash size={16} />}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleGeneratePassword}
-                    title="Generate Password"
-                    className="p-2 rounded-md text-default-400 hover:text-foreground transition-colors"
-                  >
-                    <FaSync size={16} className={isGenerating ? "animate-spin" : ""} />
-                  </button>
-                </div>
-              </div>
+                  <InputGroup.Suffix>
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className={`${showPassword ? "text-primary" : "text-default-400"} hover:text-foreground`}
+                    >
+                      {showPassword ? <FaEye size={16} /> : <FaEyeSlash size={16} />}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleGeneratePassword}
+                      title="Generate Password"
+                      className="text-default-400 hover:text-foreground"
+                    >
+                      <FaSync size={16} className={isGenerating ? "animate-spin" : ""} />
+                    </button>
+                  </InputGroup.Suffix>
+                </InputGroup>
+              </TextField>
             </Modal.Body>
             <Modal.Footer>
               <Button slot="close" variant="outline">

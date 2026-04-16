@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Button, Card, Input, Separator, Spinner, toast } from "@heroui/react";
+import { Button, Card, Input, Separator, Spinner, TextField, Label, toast } from "@heroui/react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { api } from "@/lib/api-client";
@@ -103,15 +103,15 @@ function LoginPage() {
               <p className="text-sm text-default-500 text-center">
                 Enter the 6-digit code sent to your email
               </p>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium">Verification Code</span>
+              <TextField>
+                <Label>Verification Code</Label>
                 <Input
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   maxLength={6}
                   autoFocus
                 />
-              </label>
+              </TextField>
               <Button type="submit" variant="primary" fullWidth isDisabled={isLoading}>
                 {isLoading ? <Spinner size="sm" /> : "Verify"}
               </Button>
@@ -122,8 +122,8 @@ function LoginPage() {
           ) : (
             <>
               <form onSubmit={handleLogin} className="flex flex-col gap-4">
-                <label className="flex flex-col gap-1">
-                  <span className="text-sm font-medium">Email</span>
+                <TextField>
+                  <Label>Email</Label>
                   <Input
                     type="email"
                     value={email}
@@ -131,16 +131,16 @@ function LoginPage() {
                     required
                     autoFocus
                   />
-                </label>
-                <label className="flex flex-col gap-1">
-                  <span className="text-sm font-medium">Password</span>
+                </TextField>
+                <TextField>
+                  <Label>Password</Label>
                   <Input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
-                </label>
+                </TextField>
                 <div className="flex justify-end">
                   <a href="/reset-password" className="text-sm text-primary">
                     Forgot password?

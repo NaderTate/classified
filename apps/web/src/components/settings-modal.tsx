@@ -1,4 +1,4 @@
-import { Button, Input, Modal, toast } from "@heroui/react";
+import { Button, Input, Modal, Switch, TextField, Label, toast } from "@heroui/react";
 import { useState, useEffect } from "react";
 import { useUser, useUpdateSettings } from "@/hooks/use-user";
 
@@ -66,43 +66,38 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
             <Modal.Heading>Settings</Modal.Heading>
           </Modal.Header>
           <Modal.Body className="flex flex-col gap-4">
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium">Name</span>
+            <TextField>
+              <Label>Name</Label>
               <Input value={name} onChange={(e) => setName(e.target.value)} />
-            </label>
+            </TextField>
             {!user?.isOAuth && (
               <>
-                <label className="flex flex-col gap-1">
-                  <span className="text-sm font-medium">Email</span>
+                <TextField>
+                  <Label>Email</Label>
                   <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                </label>
-                <label className="flex flex-col gap-1">
-                  <span className="text-sm font-medium">Current Password</span>
+                </TextField>
+                <TextField>
+                  <Label>Current Password</Label>
                   <Input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
-                </label>
-                <label className="flex flex-col gap-1">
-                  <span className="text-sm font-medium">New Password</span>
+                </TextField>
+                <TextField>
+                  <Label>New Password</Label>
                   <Input
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                   />
-                </label>
+                </TextField>
               </>
             )}
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isTwoFactorEnabled}
-                onChange={(e) => setIsTwoFactorEnabled(e.target.checked)}
-                className="w-4 h-4 rounded"
-              />
-              <span className="text-sm">Two-Factor Authentication</span>
-            </label>
+            <Switch isSelected={isTwoFactorEnabled} onChange={(val) => setIsTwoFactorEnabled(val)}>
+              <Switch.Control><Switch.Thumb /></Switch.Control>
+              <Switch.Content>Two-Factor Authentication</Switch.Content>
+            </Switch>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="ghost" onPress={onClose}>

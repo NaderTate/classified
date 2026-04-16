@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Button, Card, Input, Spinner, toast } from "@heroui/react";
+import { Button, Card, Input, Spinner, TextField, Label, toast } from "@heroui/react";
 import { useState } from "react";
 import { api } from "@/lib/api-client";
 
@@ -43,8 +43,8 @@ function NewPasswordPage() {
         </Card.Header>
         <Card.Content>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium">New Password</span>
+            <TextField>
+              <Label>New Password</Label>
               <Input
                 type="password"
                 value={password}
@@ -53,7 +53,7 @@ function NewPasswordPage() {
                 autoFocus
               />
               <span className="text-xs text-default-400">Minimum 6 characters</span>
-            </label>
+            </TextField>
             <Button type="submit" variant="primary" fullWidth isDisabled={isLoading}>
               {isLoading ? <Spinner size="sm" /> : "Reset Password"}
             </Button>
