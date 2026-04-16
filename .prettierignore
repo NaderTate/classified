@@ -1,0 +1,9 @@
+node_modules
+dist
+.next
+.turbo
+coverage
+bun.lockb
+old_data
+_old_nextjs_backup
+.superpowers
