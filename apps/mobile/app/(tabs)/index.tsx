@@ -19,7 +19,9 @@ export default function RecordsScreen() {
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   const queryParams = useMemo(() => ({ page, search: debouncedSearch }), [page, debouncedSearch]);
-  const { data, isLoading, refetch, isRefetching } = useRecords(queryParams);
+  const { data, isLoading, refetch, isRefetching, isFetching } = useRecords(queryParams);
+
+  console.log("[RecordsScreen] render", { page, debouncedSearch, isLoading, isFetching, recordCount: data?.records?.length, totalCount: data?.totalCount });
 
   const handleSearch = (value: string) => {
     setSearch(value);
@@ -29,10 +31,14 @@ export default function RecordsScreen() {
   };
 
   const handleEndReached = useCallback(() => {
-    if (data && data.records.length < data.resultsCount) {
-      setPage((p) => p + 1);
-    }
-  }, [data]);
+    // Don't paginate if already fetching or no more data
+    if (isFetching) return;
+    if (!data) return;
+    const loadedSoFar = page * (data.limit || 12);
+    if (loadedSoFar >= data.resultsCount) return;
+    console.log("[RecordsScreen] onEndReached — loading page", page + 1);
+    setPage((p) => p + 1);
+  }, [data, page, isFetching]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }} edges={["top"]}>
