@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useMemo } from "react";
 import { View, FlatList, Text, RefreshControl } from "react-native";
 import { SearchField, Button, Skeleton } from "heroui-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,10 +18,8 @@ export default function RecordsScreen() {
   const [showCreate, setShowCreate] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
-  const { data, isLoading, refetch, isRefetching } = useRecords({
-    page,
-    search: debouncedSearch,
-  });
+  const queryParams = useMemo(() => ({ page, search: debouncedSearch }), [page, debouncedSearch]);
+  const { data, isLoading, refetch, isRefetching } = useRecords(queryParams);
 
   const handleSearch = (value: string) => {
     setSearch(value);
