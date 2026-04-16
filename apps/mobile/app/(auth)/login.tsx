@@ -20,8 +20,10 @@ export default function LoginScreen() {
       const result: LoginResponse = await login({ email, password });
       if ("twoFactor" in result) {
         router.push({ pathname: "/(auth)/two-factor", params: { email: result.email } });
+      } else {
+        // Login succeeded — navigate to tabs explicitly
+        router.replace("/(tabs)");
       }
-      // If tokens returned, auth context handles redirect via AuthRedirect
     } catch (err) {
       Alert.alert("Login Failed", err instanceof Error ? err.message : "Invalid credentials");
     } finally {
