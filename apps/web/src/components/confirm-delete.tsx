@@ -41,8 +41,8 @@ export default function ConfirmDelete({ isOpen, onClose, record }: ConfirmDelete
           </Modal.Header>
           <Modal.Body>
             <p>
-              Are you sure you want to delete{" "}
-              <strong>{record?.site || "this record"}</strong>? This action cannot be undone.
+              Are you sure you want to delete <strong>{record?.site || "this record"}</strong>? This
+              action cannot be undone.
             </p>
           </Modal.Body>
           <Modal.Footer>
