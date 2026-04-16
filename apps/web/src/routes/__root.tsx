@@ -12,7 +12,7 @@ function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <div className="min-h-screen bg-background text-foreground">
+        <div className="min-h-screen text-foreground">
           <Outlet />
           <Toaster
             position="bottom-right"
