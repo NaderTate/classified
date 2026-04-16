@@ -3,7 +3,9 @@
   "private": true,
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --filter=!@classified/mobile",
+    "dev:all": "turbo run dev",
+    "dev:mobile": "cd apps/mobile && bunx expo start",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
@@ -19,5 +21,8 @@
     "turbo": "^2.9.6",
     "typescript-eslint": "^8.58.2"
   },
-  "packageManager": "bun@1.3.9"
+  "packageManager": "bun@1.3.9",
+  "dependencies": {
+    "ajv": "^8.18.0"
+  }
 }

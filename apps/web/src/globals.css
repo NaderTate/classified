@@ -2,3 +2,35 @@
 @import "@heroui/styles";
 
 @source "../node_modules/@heroui/styles/dist/**/*.js";
+@source "../node_modules/@heroui/react/dist/**/*.js";
+
+/*
+ * Dark mode fixes — HeroUI's default dark theme has invisible inputs
+ * (transparent borders, same bg as card) and dark text on outline buttons.
+ * Override the Tailwind-mapped variable names directly.
+ */
+.dark,
+[data-theme="dark"] {
+  /* Input fields: add border and distinct background */
+  --border-width-field: 1px;
+  --color-field-border: oklch(38% 0.006 286.033);
+  --color-field-border-hover: oklch(45% 0.006 286.033);
+  --color-field-background: oklch(16% 0.005 285.823);
+  --field-border-width: 1px;
+  --field-border: oklch(38% 0.006 286.033);
+  --field-background: oklch(16% 0.005 285.823);
+
+  /* Outline buttons: white text instead of dark */
+  --color-default-foreground: oklch(0.9911 0 0);
+  --default-foreground: oklch(0.9911 0 0);
+
+  /* Borders and separators: visible */
+  --color-border: oklch(38% 0.006 286.033);
+  --border: oklch(38% 0.006 286.033);
+  --color-separator: oklch(32% 0.006 286.033);
+  --separator: oklch(32% 0.006 286.033);
+
+  /* Default color (used for outline button bg on hover) */
+  --color-default: oklch(27.4% 0.006 286.033);
+  --default: oklch(27.4% 0.006 286.033);
+}
