@@ -1,2 +1,5 @@
 [install]
 peer = false
+# React Native / Expo tooling (babel, metro) requires classical hoisted
+# node_modules layout to resolve transitive peer deps.
+linker = "hoisted"
