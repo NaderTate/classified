@@ -11,7 +11,8 @@
     "lint": "eslint app/ components/ lib/ hooks/",
     "type-check": "tsc --noEmit",
     "format:check": "prettier --check \"**/*.{ts,tsx}\"",
-    "format": "prettier --write \"**/*.{ts,tsx}\""
+    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "eas-build-post-install": "cd ../.. && bun run --filter=@classified/shared build"
   },
   "dependencies": {
     "@classified/shared": "workspace:*",

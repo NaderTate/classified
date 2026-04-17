@@ -21,6 +21,13 @@
       "expo-router",
       "expo-secure-store",
       "expo-asset"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "93def25f-2844-469b-a5ce-513ff56254a9"
+      }
+    },
+    "owner": "nadertate"
   }
 }
