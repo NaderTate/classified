@@ -1,8 +1,7 @@
-import { Alert } from "react-native";
+import { Alert, Platform, ToastAndroid } from "react-native";
 import { useEffect } from "react";
-import { useDeleteRecord } from "@/hooks/use-records";
-import { useToast } from "heroui-native";
 import * as Haptics from "expo-haptics";
+import { useDeleteRecord } from "@/hooks/use-records";
 import type { Record as RecordType } from "@classified/shared";
 
 interface ConfirmDeleteProps {
@@ -11,15 +10,20 @@ interface ConfirmDeleteProps {
   record: RecordType | null;
 }
 
+function flash(message: string) {
+  if (Platform.OS === "android") {
+    ToastAndroid.show(message, ToastAndroid.SHORT);
+  }
+}
+
 export default function ConfirmDelete({ isOpen, onClose, record }: ConfirmDeleteProps) {
   const deleteRecord = useDeleteRecord();
-  const { toast } = useToast();
 
   useEffect(() => {
     if (!isOpen || !record) return;
 
     Alert.alert(
-      "Delete Record",
+      "Delete record",
       `Are you sure you want to delete ${record.site || "this record"}? This cannot be undone.`,
       [
         { text: "Cancel", style: "cancel", onPress: onClose },
@@ -30,7 +34,7 @@ export default function ConfirmDelete({ isOpen, onClose, record }: ConfirmDelete
             try {
               await deleteRecord.mutateAsync(record.id);
               await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              toast.show({ variant: "success", label: "Record deleted" });
+              flash("Record deleted");
             } catch (err) {
               Alert.alert("Error", err instanceof Error ? err.message : "Failed to delete");
             }

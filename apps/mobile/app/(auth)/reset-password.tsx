@@ -1,28 +1,26 @@
-import { ScrollView, Alert } from "react-native";
-import { Button, Card, Input, TextField, Label } from "heroui-native";
+import { ScrollView, Alert, View, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { Text } from "@/components/ui/text";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api-client";
-import { useToast } from "heroui-native";
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
-  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleReset = async () => {
     if (!email) return;
     setIsLoading(true);
-
     try {
       await api.auth.resetPassword({ email });
-      toast.show({
-        variant: "success",
-        label: "Email Sent",
-        description: "Check your inbox for a reset link",
-      });
-      router.back();
+      Alert.alert("Email sent", "Check your inbox for a reset link", [
+        { text: "OK", onPress: () => router.back() },
+      ]);
     } catch (err) {
       Alert.alert("Error", err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -31,37 +29,43 @@ export default function ResetPasswordScreen() {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1, justifyContent: "center", padding: 24 }}
-      keyboardShouldPersistTaps="handled"
-    >
-      <Card>
-        <Card.Header style={{ alignItems: "center" }}>
-          <Card.Title>Reset Password</Card.Title>
-          <Card.Description>We'll send a reset link to your email</Card.Description>
-        </Card.Header>
-        <Card.Body style={{ gap: 16 }}>
-          <TextField>
+    <SafeAreaView className="flex-1 bg-background">
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center", padding: 24 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View className="items-center mb-10">
+          <Text className="text-3xl font-bold mb-2">Reset password</Text>
+          <Text className="text-muted-foreground text-center">
+            We'll send a reset link to your email
+          </Text>
+        </View>
+
+        <View className="gap-4">
+          <View>
             <Label>Email</Label>
             <Input
-              placeholder="Enter your email"
+              placeholder="you@example.com"
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
               keyboardType="email-address"
               textContentType="emailAddress"
             />
-          </TextField>
+          </View>
 
-          <Button variant="primary" onPress={handleReset} isDisabled={isLoading}>
-            <Button.Label>{isLoading ? "Sending..." : "Send Reset Link"}</Button.Label>
-          </Button>
+          <Button
+            label={isLoading ? "Sending..." : "Send Reset Link"}
+            onPress={handleReset}
+            loading={isLoading}
+            className="mt-2"
+          />
 
-          <Button variant="ghost" onPress={() => router.back()}>
-            <Button.Label>Back to login</Button.Label>
-          </Button>
-        </Card.Body>
-      </Card>
-    </ScrollView>
+          <Pressable onPress={() => router.back()} className="self-center mt-2">
+            <Text className="text-primary text-sm">Back to login</Text>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

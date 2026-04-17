@@ -1,7 +1,11 @@
-import { ScrollView, Alert } from "react-native";
-import { Button, Card, Input, TextField, Label } from "heroui-native";
+import { ScrollView, Alert, View, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
+import { Text } from "@/components/ui/text";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/auth-context";
 
 export default function TwoFactorScreen() {
@@ -14,10 +18,8 @@ export default function TwoFactorScreen() {
   const handleVerify = async () => {
     if (!code || code.length !== 6) return;
     setIsLoading(true);
-
     try {
       await loginWithTwoFactor({ email: email!, code });
-      // Auth context will redirect to tabs via AuthRedirect
     } catch (err) {
       Alert.alert("Invalid Code", err instanceof Error ? err.message : "Please try again");
     } finally {
@@ -26,17 +28,20 @@ export default function TwoFactorScreen() {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1, justifyContent: "center", padding: 24 }}
-      keyboardShouldPersistTaps="handled"
-    >
-      <Card>
-        <Card.Header style={{ alignItems: "center" }}>
-          <Card.Title>Two-Factor Authentication</Card.Title>
-          <Card.Description>Enter the 6-digit code sent to your email</Card.Description>
-        </Card.Header>
-        <Card.Body style={{ gap: 16 }}>
-          <TextField>
+    <SafeAreaView className="flex-1 bg-background">
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center", padding: 24 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View className="items-center mb-10">
+          <Text className="text-3xl font-bold mb-2">Two-factor auth</Text>
+          <Text className="text-muted-foreground text-center">
+            Enter the 6-digit code sent to your email
+          </Text>
+        </View>
+
+        <View className="gap-4">
+          <View>
             <Label>Code</Label>
             <Input
               placeholder="000000"
@@ -45,18 +50,22 @@ export default function TwoFactorScreen() {
               keyboardType="number-pad"
               maxLength={6}
               textContentType="oneTimeCode"
+              className="text-center text-2xl tracking-widest"
             />
-          </TextField>
+          </View>
 
-          <Button variant="primary" onPress={handleVerify} isDisabled={isLoading}>
-            <Button.Label>{isLoading ? "Verifying..." : "Verify"}</Button.Label>
-          </Button>
+          <Button
+            label={isLoading ? "Verifying..." : "Verify"}
+            onPress={handleVerify}
+            loading={isLoading}
+            className="mt-2"
+          />
 
-          <Button variant="ghost" onPress={() => router.back()}>
-            <Button.Label>Back to login</Button.Label>
-          </Button>
-        </Card.Body>
-      </Card>
-    </ScrollView>
+          <Pressable onPress={() => router.back()} className="self-center mt-2">
+            <Text className="text-primary text-sm">Back to login</Text>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

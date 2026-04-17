@@ -1,34 +1,37 @@
-import { useState } from "react";
-import { ScrollView, View, Text, Image, Alert } from "react-native";
-import { Button, Card, Input, TextField, Label, Switch } from "heroui-native";
+import { useEffect, useState } from "react";
+import { ScrollView, View, Image, Alert, Switch } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Text } from "@/components/ui/text";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/lib/auth-context";
 import { useUser, useUpdateSettings } from "@/hooks/use-user";
-import { useToast } from "heroui-native";
 
 export default function SettingsScreen() {
   const { logout } = useAuth();
   const { data: user } = useUser();
   const updateSettings = useUpdateSettings();
-  const { toast } = useToast();
 
-  const [name, setName] = useState(user?.name ?? "");
-  const [email, setEmail] = useState(user?.email ?? "");
-  const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(user?.isTwoFactorEnabled ?? false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(false);
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [showPasswordChange, setShowPasswordChange] = useState(false);
 
-  // Sync state when user loads (only when fields are still at default)
-  if (user && name === "" && user.name) {
-    setName(user.name);
-    setEmail(user.email);
-    setIsTwoFactorEnabled(user.isTwoFactorEnabled);
-  }
+  useEffect(() => {
+    if (user) {
+      setName(user.name ?? "");
+      setEmail(user.email ?? "");
+      setIsTwoFactorEnabled(user.isTwoFactorEnabled ?? false);
+    }
+  }, [user]);
 
   const handleSave = async () => {
     const data: Record<string, unknown> = {};
-
     if (name !== user?.name) data.name = name;
     if (email !== user?.email) data.email = email;
     if (isTwoFactorEnabled !== user?.isTwoFactorEnabled)
@@ -39,15 +42,16 @@ export default function SettingsScreen() {
     }
 
     if (Object.keys(data).length === 0) {
-      toast.show({ label: "No changes" });
+      Alert.alert("No changes", "Nothing to save.");
       return;
     }
 
     try {
       await updateSettings.mutateAsync(data);
-      toast.show({ variant: "success", label: "Settings updated" });
+      Alert.alert("Saved", "Settings updated.");
       setPassword("");
       setNewPassword("");
+      setShowPasswordChange(false);
     } catch (err) {
       Alert.alert("Error", err instanceof Error ? err.message : "Failed to update settings");
     }
@@ -61,30 +65,24 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }} edges={["top"]}>
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 24, paddingBottom: 48 }}>
-        <Text style={{ color: "#fff", fontSize: 28, fontWeight: "bold" }}>Settings</Text>
+    <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
+      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 48 }}>
+        <Text className="text-2xl font-bold mb-5">Settings</Text>
 
-        {/* Profile */}
-        <Card>
-          <Card.Header>
-            <Card.Title>Profile</Card.Title>
-          </Card.Header>
-          <Card.Body style={{ gap: 16 }}>
+        <Card className="mb-4">
+          <Text className="text-lg font-semibold mb-4">Profile</Text>
+          <View className="gap-4">
             {user?.image && (
-              <View style={{ alignItems: "center" }}>
-                <Image
-                  source={{ uri: user.image }}
-                  style={{ width: 64, height: 64, borderRadius: 32 }}
-                />
+              <View className="items-center mb-2">
+                <Image source={{ uri: user.image }} className="h-20 w-20 rounded-full" />
               </View>
             )}
-            <TextField>
+            <View>
               <Label>Name</Label>
               <Input value={name} onChangeText={setName} />
-            </TextField>
+            </View>
             {!user?.isOAuth && (
-              <TextField>
+              <View>
                 <Label>Email</Label>
                 <Input
                   value={email}
@@ -92,62 +90,66 @@ export default function SettingsScreen() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
-              </TextField>
+              </View>
             )}
-          </Card.Body>
+          </View>
         </Card>
 
-        {/* Security */}
-        <Card>
-          <Card.Header>
-            <Card.Title>Security</Card.Title>
-          </Card.Header>
-          <Card.Body style={{ gap: 16 }}>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Text style={{ color: "#fff" }}>Two-Factor Authentication</Text>
-              <Switch isSelected={isTwoFactorEnabled} onSelectedChange={setIsTwoFactorEnabled} />
+        <Card className="mb-4">
+          <Text className="text-lg font-semibold mb-4">Security</Text>
+          <View className="gap-4">
+            <View className="flex-row justify-between items-center">
+              <View>
+                <Text className="font-medium">Two-Factor Authentication</Text>
+                <Text className="text-muted-foreground text-xs mt-1">
+                  Require a code sent to email
+                </Text>
+              </View>
+              <Switch
+                value={isTwoFactorEnabled}
+                onValueChange={setIsTwoFactorEnabled}
+                trackColor={{ false: "#262626", true: "#1d4ed8" }}
+                thumbColor={isTwoFactorEnabled ? "#3b82f6" : "#737373"}
+              />
             </View>
 
             {!user?.isOAuth && (
               <>
-                <Button variant="ghost" onPress={() => setShowPasswordChange(!showPasswordChange)}>
-                  <Button.Label>{showPasswordChange ? "Cancel" : "Change Password"}</Button.Label>
-                </Button>
+                <Separator />
+                <Button
+                  variant="ghost"
+                  label={showPasswordChange ? "Cancel password change" : "Change password"}
+                  onPress={() => setShowPasswordChange(!showPasswordChange)}
+                />
                 {showPasswordChange && (
                   <>
-                    <TextField>
+                    <View>
                       <Label>Current Password</Label>
                       <Input value={password} onChangeText={setPassword} secureTextEntry />
-                    </TextField>
-                    <TextField>
+                    </View>
+                    <View>
                       <Label>New Password</Label>
-                      <Input value={newPassword} onChangeText={setNewPassword} secureTextEntry />
-                    </TextField>
+                      <Input
+                        value={newPassword}
+                        onChangeText={setNewPassword}
+                        secureTextEntry
+                      />
+                    </View>
                   </>
                 )}
               </>
             )}
-          </Card.Body>
+          </View>
         </Card>
 
-        {/* Save */}
-        <Button variant="primary" onPress={handleSave} isDisabled={updateSettings.isPending}>
-          <Button.Label>{updateSettings.isPending ? "Saving..." : "Save Changes"}</Button.Label>
-        </Button>
+        <Button
+          label={updateSettings.isPending ? "Saving..." : "Save changes"}
+          onPress={handleSave}
+          loading={updateSettings.isPending}
+          className="mb-3"
+        />
 
-        {/* Divider */}
-        <View style={{ height: 1, backgroundColor: "#27272a" }} />
-
-        {/* Logout */}
-        <Button variant="danger" onPress={handleLogout}>
-          <Button.Label>Logout</Button.Label>
-        </Button>
+        <Button label="Logout" variant="destructive" onPress={handleLogout} />
       </ScrollView>
     </SafeAreaView>
   );

@@ -6,15 +6,23 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: { backgroundColor: "#18181b", borderTopColor: "#27272a" },
+        tabBarStyle: {
+          backgroundColor: "#0a0a0a",
+          borderTopColor: "#262626",
+          borderTopWidth: 1,
+          height: 64,
+          paddingTop: 6,
+          paddingBottom: 8,
+        },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: "600" },
         tabBarActiveTintColor: "#3b82f6",
-        tabBarInactiveTintColor: "#71717a",
+        tabBarInactiveTintColor: "#737373",
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Records",
+          title: "Vault",
           tabBarIcon: ({ color, size }) => <Ionicons name="key" size={size} color={color} />,
         }}
       />
@@ -22,7 +30,9 @@ export default function TabsLayout() {
         name="settings"
         options={{
           title: "Settings",
-          tabBarIcon: ({ color, size }) => <Ionicons name="settings" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings-sharp" size={size} color={color} />
+          ),
         }}
       />
     </Tabs>

@@ -1,15 +1,16 @@
 import React, { useState, useRef, useMemo, useCallback } from "react";
-import { View, FlatList, Text, RefreshControl } from "react-native";
-import { SearchField, Button, Skeleton } from "heroui-native";
+import { View, FlatList, RefreshControl, Pressable, ActivityIndicator } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { Text } from "@/components/ui/text";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useRecords } from "@/hooks/use-records";
 import RecordCard from "@/components/record-card";
 import RecordForm from "@/components/record-form";
 import ConfirmDelete from "@/components/confirm-delete";
 import type { Record as RecordType } from "@classified/shared";
-import { SafeAreaView } from "react-native-safe-area-context";
 
-// Memoize to prevent re-render when modal state changes
 const MemoRecordCard = React.memo(RecordCard);
 
 export default function RecordsScreen() {
@@ -21,7 +22,10 @@ export default function RecordsScreen() {
   const [showCreate, setShowCreate] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
-  const queryParams = useMemo(() => ({ page, search: debouncedSearch, limit: 20 }), [page, debouncedSearch]);
+  const queryParams = useMemo(
+    () => ({ page, search: debouncedSearch, limit: 20 }),
+    [page, debouncedSearch],
+  );
   const { data, isLoading, refetch, isRefetching } = useRecords(queryParams);
 
   const handleSearch = useCallback((value: string) => {
@@ -31,58 +35,74 @@ export default function RecordsScreen() {
     timeoutRef.current = setTimeout(() => setDebouncedSearch(value), 300);
   }, []);
 
-  // Stable callbacks so MemoRecordCard doesn't re-render
+  const clearSearch = useCallback(() => {
+    setSearch("");
+    setDebouncedSearch("");
+    setPage(1);
+  }, []);
+
   const onEdit = useCallback((r: RecordType) => setEditRecord(r), []);
   const onDelete = useCallback((r: RecordType) => setDeleteRecord(r), []);
   const onOpenCreate = useCallback(() => setShowCreate(true), []);
 
-  const totalPages = data ? Math.ceil(data.resultsCount / (data.limit || 50)) : 1;
+  const totalPages = data ? Math.ceil(data.resultsCount / (data.limit || 20)) : 1;
   const hasNextPage = page < totalPages;
   const hasPrevPage = page > 1;
 
-  const renderItem = useCallback(({ item }: { item: RecordType }) => (
-    <MemoRecordCard record={item} onEdit={onEdit} onDelete={onDelete} />
-  ), [onEdit, onDelete]);
+  const renderItem = useCallback(
+    ({ item }: { item: RecordType }) => (
+      <MemoRecordCard record={item} onEdit={onEdit} onDelete={onDelete} />
+    ),
+    [onEdit, onDelete],
+  );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }} edges={["top"]}>
-      <View style={{ flex: 1, paddingHorizontal: 16 }}>
-        {/* Header */}
-        <View style={{ flexDirection: "row", alignItems: "center", paddingVertical: 12, gap: 12 }}>
-          <View style={{ flex: 1 }}>
-            <SearchField value={search} onChange={handleSearch}>
-              <SearchField.Group>
-                <SearchField.SearchIcon />
-                <SearchField.Input placeholder="Search records..." />
-                <SearchField.ClearButton />
-              </SearchField.Group>
-            </SearchField>
-          </View>
-          <Button isIconOnly variant="primary" onPress={onOpenCreate}>
-            <Ionicons name="add" size={24} color="#fff" />
-          </Button>
+    <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
+      <View className="flex-1 px-4">
+        <View className="flex-row items-center justify-between pt-2 pb-4">
+          <Text className="text-2xl font-bold">Vault</Text>
+          <Pressable
+            onPress={onOpenCreate}
+            className="h-11 w-11 rounded-full bg-primary items-center justify-center active:opacity-80"
+            android_ripple={{ color: "rgba(255,255,255,0.2)", borderless: true }}
+          >
+            <Ionicons name="add" size={26} color="#fff" />
+          </Pressable>
         </View>
 
-        {/* Stats */}
+        <Input
+          value={search}
+          onChangeText={handleSearch}
+          placeholder="Search records..."
+          autoCapitalize="none"
+          autoCorrect={false}
+          leftIcon={<Ionicons name="search" size={18} color="#737373" />}
+          rightIcon={
+            search ? (
+              <Pressable onPress={clearSearch} hitSlop={8}>
+                <Ionicons name="close-circle" size={18} color="#737373" />
+              </Pressable>
+            ) : null
+          }
+        />
+
         {data && (
-          <Text style={{ color: "#71717a", fontSize: 13, marginBottom: 8 }}>
-            {data.totalCount} records total
+          <Text className="text-muted-foreground text-xs mt-3 mb-2">
+            {data.totalCount} {data.totalCount === 1 ? "record" : "records"}
           </Text>
         )}
 
-        {/* List */}
         {isLoading ? (
-          <View style={{ gap: 12 }}>
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} style={{ height: 72, borderRadius: 12 }} />
-            ))}
+          <View className="flex-1 items-center justify-center">
+            <ActivityIndicator size="large" color="#3b82f6" />
           </View>
         ) : (
           <FlatList
             data={data?.records || []}
             keyExtractor={(item) => item.id}
             renderItem={renderItem}
-            contentContainerStyle={{ gap: 8, paddingBottom: 100 }}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ gap: 8, paddingBottom: 24 }}
             refreshControl={
               <RefreshControl
                 refreshing={isRefetching}
@@ -91,26 +111,36 @@ export default function RecordsScreen() {
               />
             }
             ListEmptyComponent={
-              <View style={{ alignItems: "center", paddingTop: 48 }}>
-                <Text style={{ color: "#71717a" }}>
-                  {debouncedSearch
-                    ? "No records match your search."
-                    : "No records yet. Tap + to add one!"}
+              <View className="items-center pt-20">
+                <Ionicons name="key-outline" size={48} color="#525252" />
+                <Text className="text-muted-foreground mt-4 text-center">
+                  {debouncedSearch ? "No records match your search." : "No records yet."}
                 </Text>
+                {!debouncedSearch && (
+                  <Text className="text-muted-foreground text-sm mt-1">Tap + to add one</Text>
+                )}
               </View>
             }
             ListFooterComponent={
               totalPages > 1 ? (
-                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 16, paddingVertical: 16 }}>
-                  <Button size="sm" variant="outline" isDisabled={!hasPrevPage} onPress={() => setPage((p) => p - 1)}>
-                    <Button.Label>Previous</Button.Label>
-                  </Button>
-                  <Text style={{ color: "#a1a1aa", fontSize: 14 }}>
+                <View className="flex-row justify-center items-center gap-4 py-4">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    label="Previous"
+                    disabled={!hasPrevPage}
+                    onPress={() => setPage((p) => p - 1)}
+                  />
+                  <Text className="text-muted-foreground text-sm">
                     {page} / {totalPages}
                   </Text>
-                  <Button size="sm" variant="outline" isDisabled={!hasNextPage} onPress={() => setPage((p) => p + 1)}>
-                    <Button.Label>Next</Button.Label>
-                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    label="Next"
+                    disabled={!hasNextPage}
+                    onPress={() => setPage((p) => p + 1)}
+                  />
                 </View>
               ) : null
             }

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator } from "react-native";
-import { Button } from "heroui-native";
+import { View, ActivityIndicator } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { Text } from "@/components/ui/text";
+import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api-client";
 
 export default function VerifyEmailScreen() {
@@ -30,32 +32,26 @@ export default function VerifyEmailScreen() {
   }, [token]);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 24,
-        backgroundColor: "#000",
-      }}
-    >
-      {status === "loading" && <ActivityIndicator size="large" color="#3b82f6" />}
-      {status === "success" && (
-        <>
-          <Text style={{ color: "#22c55e", fontSize: 18, marginBottom: 16 }}>{message}</Text>
-          <Button variant="primary" onPress={() => router.replace("/(auth)/login")}>
-            <Button.Label>Go to Login</Button.Label>
-          </Button>
-        </>
-      )}
-      {status === "error" && (
-        <>
-          <Text style={{ color: "#ef4444", fontSize: 18, marginBottom: 16 }}>{message}</Text>
-          <Button variant="ghost" onPress={() => router.replace("/(auth)/login")}>
-            <Button.Label>Back to Login</Button.Label>
-          </Button>
-        </>
-      )}
-    </View>
+    <SafeAreaView className="flex-1 bg-background">
+      <View className="flex-1 justify-center items-center px-6">
+        {status === "loading" && <ActivityIndicator size="large" color="#3b82f6" />}
+        {status === "success" && (
+          <>
+            <Text className="text-green-500 text-lg mb-6 text-center">{message}</Text>
+            <Button label="Go to Login" onPress={() => router.replace("/(auth)/login")} />
+          </>
+        )}
+        {status === "error" && (
+          <>
+            <Text className="text-destructive text-lg mb-6 text-center">{message}</Text>
+            <Button
+              label="Back to Login"
+              variant="ghost"
+              onPress={() => router.replace("/(auth)/login")}
+            />
+          </>
+        )}
+      </View>
+    </SafeAreaView>
   );
 }
