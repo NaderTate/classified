@@ -23,6 +23,9 @@ describe("normalizeHostname", () => {
   it("passes through bare domains", () => {
     expect(normalizeHostname("example.org")).toBe("example.org");
   });
+  it("strips trailing dot", () => {
+    expect(normalizeHostname("github.com.")).toBe("github.com");
+  });
 });
 
 describe("findMatches", () => {

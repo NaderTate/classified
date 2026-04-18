@@ -7,7 +7,7 @@ const TWO_PART_TLDS = new Set([
 ]);
 
 export function normalizeHostname(host: string): string {
-  return host.trim().toLowerCase().replace(/^www\./, "");
+  return host.trim().toLowerCase().replace(/^www\./, "").replace(/\.+$/, "");
 }
 
 function parseSite(site: string): string {
