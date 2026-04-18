@@ -30,3 +30,8 @@ prisma/generated/
 _old_nextjs_backup/
 .superpowers/
 .worktrees/
+.claude/
+.playwright-mcp/
+old_data/
+reference_heroui_native_guide.md
+/logo.jpg
