@@ -12,13 +12,10 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
-    rollupOptions: {
-      input: { popup: path.resolve(__dirname, "src/popup/index.html") },
-    },
   },
   server: { port: 5180, strictPort: true },
   test: {
-    environment: "jsdom",
+    environment: "node",
     globals: true,
   },
 });
