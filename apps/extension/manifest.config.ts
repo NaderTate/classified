@@ -14,6 +14,7 @@ export default defineManifest({
     type: "module",
   },
   permissions: ["storage", "activeTab", "clipboardWrite"],
+  host_permissions: ["https://classified-api.vercel.app/*"],
   icons: {
     "16": "public/icons/icon-16.png",
     "32": "public/icons/icon-32.png",
