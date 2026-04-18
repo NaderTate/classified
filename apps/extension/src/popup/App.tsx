@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from "./hooks/use-auth";
 import { LoginScreen } from "./screens/login";
 import { TwoFactorScreen } from "./screens/two-factor";
 import { VaultScreen } from "./screens/vault";
+import { AddRecordScreen } from "./screens/add-record";
 
 type Screen = "vault" | "add";
 
@@ -17,7 +18,7 @@ function Root() {
   if (state.status === "two-factor") return <TwoFactorScreen />;
 
   if (screen === "add") {
-    return <div className="h-[500px] flex items-center justify-center bg-background text-foreground">Add — in next task <button onClick={() => setScreen("vault")} className="text-primary ml-2">back</button></div>;
+    return <AddRecordScreen onDone={() => setScreen("vault")} />;
   }
   return <VaultScreen onAdd={() => setScreen("add")} />;
 }
