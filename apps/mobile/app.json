@@ -7,20 +7,21 @@
     "scheme": "classified",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo.jpg",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.classified.app"
     },
     "android": {
       "package": "com.classified.app",
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#000000"
+        "foregroundImage": "./assets/logo.jpg",
+        "backgroundColor": "#0a0a1f"
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/logo.jpg"
     },
     "plugins": [
       "expo-router",
@@ -29,9 +30,9 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/splash-icon.png",
+          "image": "./assets/logo.jpg",
           "resizeMode": "contain",
-          "backgroundColor": "#000000"
+          "backgroundColor": "#0a0a1f"
         }
       ]
     ],

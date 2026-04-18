@@ -5,10 +5,12 @@ import {
   Image,
   Modal,
   ScrollView,
-  KeyboardAvoidingView,
   Platform,
   Animated,
   PanResponder,
+  Keyboard,
+  Dimensions,
+  StyleSheet,
   ToastAndroid,
 } from "react-native";
 import { useState, useEffect, useCallback, useRef } from "react";
@@ -26,6 +28,8 @@ interface RecordFormProps {
   onClose: () => void;
   record?: RecordType | null;
 }
+
+const SCREEN_HEIGHT = Dimensions.get("window").height;
 
 function generatePassword(length = 20): string {
   const charset =
@@ -51,11 +55,73 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
   const [icon, setIcon] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [rendered, setRendered] = useState(isOpen);
   const insets = useSafeAreaInsets();
 
   const createRecord = useCreateRecord();
   const updateRecord = useUpdateRecord();
   const isEditing = !!record;
+
+  const overlayOpacity = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+  const dragY = useRef(new Animated.Value(0)).current;
+  const kbOffset = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (isOpen) {
+      setRendered(true);
+      dragY.setValue(0);
+      Animated.parallel([
+        Animated.timing(overlayOpacity, {
+          toValue: 0.6,
+          duration: 220,
+          useNativeDriver: true,
+        }),
+        Animated.spring(slideAnim, {
+          toValue: 0,
+          useNativeDriver: true,
+          tension: 65,
+          friction: 12,
+        }),
+      ]).start();
+    } else if (rendered) {
+      Animated.parallel([
+        Animated.timing(overlayOpacity, {
+          toValue: 0,
+          duration: 180,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: SCREEN_HEIGHT,
+          duration: 220,
+          useNativeDriver: true,
+        }),
+      ]).start(() => setRendered(false));
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      Animated.timing(kbOffset, {
+        toValue: -e.endCoordinates.height,
+        duration: 220,
+        useNativeDriver: true,
+      }).start();
+    });
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      Animated.timing(kbOffset, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: true,
+      }).start();
+    });
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -135,20 +201,23 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
 
   const isPending = createRecord.isPending || updateRecord.isPending;
 
-  const translateY = useRef(new Animated.Value(0)).current;
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => false,
       onMoveShouldSetPanResponder: (_, g) => g.dy > 10,
       onPanResponderMove: (_, g) => {
-        if (g.dy > 0) translateY.setValue(g.dy);
+        if (g.dy > 0) dragY.setValue(g.dy);
       },
       onPanResponderRelease: (_, g) => {
         if (g.dy > 80) {
+          Animated.timing(dragY, {
+            toValue: SCREEN_HEIGHT,
+            duration: 180,
+            useNativeDriver: true,
+          }).start();
           onClose();
-          translateY.setValue(0);
         } else {
-          Animated.spring(translateY, {
+          Animated.spring(dragY, {
             toValue: 0,
             useNativeDriver: true,
             tension: 80,
@@ -159,48 +228,61 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
     }),
   ).current;
 
-  useEffect(() => {
-    if (isOpen) translateY.setValue(0);
-  }, [isOpen]);
+  const translateY = Animated.add(Animated.add(slideAnim, dragY), kbOffset);
+
+  if (!rendered) return null;
 
   return (
     <Modal
-      visible={isOpen}
+      visible={rendered}
       transparent
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
       statusBarTranslucent
     >
-      <Pressable className="flex-1 bg-black/60" onPress={onClose} />
-      <Animated.View
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          maxHeight: "90%",
-          transform: [{ translateY }],
-        }}
-        className="bg-card rounded-t-3xl"
-      >
-        <View {...panResponder.panHandlers} className="items-center py-3">
-          <View className="h-1 w-10 rounded-full bg-border" />
-        </View>
+      <View style={{ flex: 1 }}>
+        <Animated.View
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: "black", opacity: overlayOpacity },
+          ]}
+        >
+          <Pressable style={{ flex: 1 }} onPress={onClose} />
+        </Animated.View>
 
-        <View className="flex-row items-center justify-between px-5 pb-4">
-          <Text className="text-lg font-bold">{isEditing ? "Edit record" : "New record"}</Text>
-          <Pressable
-            hitSlop={8}
-            onPress={onClose}
-            className="h-9 w-9 items-center justify-center rounded-full active:bg-muted"
-          >
-            <Ionicons name="close" size={22} color="#a3a3a3" />
-          </Pressable>
-        </View>
+        <Animated.View
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            maxHeight: "90%",
+            transform: [{ translateY }],
+          }}
+          className="bg-card rounded-t-3xl"
+        >
+          <View {...panResponder.panHandlers} className="items-center py-3">
+            <View className="h-1 w-10 rounded-full bg-border" />
+          </View>
 
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
+          <View className="flex-row items-center justify-between px-5 pb-4">
+            <Text className="text-lg font-bold">
+              {isEditing ? "Edit record" : "New record"}
+            </Text>
+            <Pressable
+              hitSlop={8}
+              onPress={onClose}
+              className="h-9 w-9 items-center justify-center rounded-full active:bg-muted"
+            >
+              <Ionicons name="close" size={22} color="#a3a3a3" />
+            </Pressable>
+          </View>
+
           <ScrollView
-            contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: (insets.bottom || 16) + 16 }}
+            contentContainerStyle={{
+              paddingHorizontal: 20,
+              paddingBottom: (insets.bottom || 16) + 16,
+            }}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
@@ -272,8 +354,9 @@ export default function RecordForm({ isOpen, onClose, record }: RecordFormProps)
               />
             </View>
           </ScrollView>
-        </KeyboardAvoidingView>
-      </Animated.View>
+        </Animated.View>
+      </View>
     </Modal>
   );
 }
+
