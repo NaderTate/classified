@@ -57,7 +57,7 @@ export function VaultScreen({ onAdd }: Props) {
       <div className="p-3 flex-1 overflow-y-auto">
         {query.error ? <Alert>{(query.error as Error).message}</Alert> : null}
 
-        {matches.length > 0 ? (
+        {matches.length > 0 && debouncedSearch === "" ? (
           <div className="mb-3">
             <div className="text-xs text-muted-foreground px-1 mb-1.5">For this site ({hostname})</div>
             <div className="flex flex-col gap-2">
