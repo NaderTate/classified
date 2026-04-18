@@ -8,7 +8,6 @@ import { useCurrentTabHostname } from "../hooks/use-current-tab";
 import { findMatches } from "@/lib/match";
 import { useAuth } from "../hooks/use-auth";
 import type { Record } from "@classified/shared";
-// RecordsPage type used implicitly via query.data
 
 type Props = { onAdd: () => void };
 
@@ -27,6 +26,9 @@ export function VaultScreen({ onAdd }: Props) {
   const query = useRecords({ search: debouncedSearch, page });
 
   const records = (query.data?.records ?? []) as Record[];
+  const totalPages = query.data
+    ? Math.max(1, Math.ceil(query.data.totalCount / query.data.limit))
+    : 1;
   const matches = useMemo(
     () => (hostname ? findMatches(hostname, records) : []),
     [hostname, records],
@@ -70,11 +72,11 @@ export function VaultScreen({ onAdd }: Props) {
           )}
         </div>
 
-        {query.data && query.data.totalPages > 1 ? (
+        {query.data && totalPages > 1 ? (
           <div className="flex items-center justify-between mt-3 text-xs">
             <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Prev</Button>
-            <span className="text-muted-foreground">Page {query.data.page} of {query.data.totalPages}</span>
-            <Button size="sm" variant="outline" disabled={page >= query.data.totalPages} onClick={() => setPage((p) => p + 1)}>Next</Button>
+            <span className="text-muted-foreground">Page {query.data.page} of {totalPages}</span>
+            <Button size="sm" variant="outline" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Next</Button>
           </div>
         ) : null}
       </div>

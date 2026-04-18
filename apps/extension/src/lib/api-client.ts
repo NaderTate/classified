@@ -1,3 +1,5 @@
+import type { PaginatedRecords, Record } from "@classified/shared";
+
 type Envelope<T> = { ok: true; data: T } | { ok: false; error: string; status?: number };
 
 export class SwApiError extends Error {
@@ -23,15 +25,12 @@ export const swApi = {
   twoFactor: (body: { email: string; code: string }) => send<{ ok: true }>("auth/two-factor", body),
   logout: () => send<{ ok: true }>("auth/logout"),
   listRecords: (body?: { search?: string; page?: number }) =>
-    send<{ records: unknown[]; total: number; page: number; limit: number; totalPages: number }>(
-      "records/list",
-      body,
-    ),
+    send<PaginatedRecords>("records/list", body),
   createRecord: (body: {
     site?: string;
     username?: string;
     email?: string;
     password?: string;
     icon?: string;
-  }) => send<unknown>("records/create", body),
+  }) => send<Record>("records/create", body),
 };
