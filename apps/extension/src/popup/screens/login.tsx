@@ -4,7 +4,7 @@ import { Button } from "../components/button";
 import { Alert } from "../components/alert";
 import { useAuth } from "../hooks/use-auth";
 
-const WEB_URL = "https://classified.vercel.app";
+const WEB_URL = "https://classifiedd.vercel.app/";
 
 export function LoginScreen() {
   const { login } = useAuth();

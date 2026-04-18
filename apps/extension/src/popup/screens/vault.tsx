@@ -7,7 +7,10 @@ import { useRecords } from "../hooks/use-records";
 import { useCurrentTabHostname } from "../hooks/use-current-tab";
 import { findMatches } from "@/lib/match";
 import { useAuth } from "../hooks/use-auth";
+import { PlusIcon } from "../components/icons";
 import type { Record } from "@classified/shared";
+
+const WEB_URL = "https://classifiedd.vercel.app/";
 
 type Props = { onAdd: () => void };
 
@@ -39,7 +42,7 @@ export function VaultScreen({ onAdd }: Props) {
       <div className="flex items-center justify-between px-4 h-11 border-b border-border">
         <div className="font-semibold text-sm">Classified</div>
         <div className="flex gap-1">
-          <Button size="sm" variant="ghost" onClick={() => chrome.tabs.create({ url: "https://classified.vercel.app" })}>Web</Button>
+          <Button size="sm" variant="ghost" onClick={() => chrome.tabs.create({ url: WEB_URL })}>Web</Button>
           <Button size="sm" variant="ghost" onClick={() => void logout()}>Logout</Button>
         </div>
       </div>
@@ -49,8 +52,8 @@ export function VaultScreen({ onAdd }: Props) {
 
         {matches.length > 0 ? (
           <div className="mb-3">
-            <div className="text-xs text-muted-foreground px-1 mb-1">For this site ({hostname})</div>
-            <div className="flex flex-col gap-1">
+            <div className="text-xs text-muted-foreground px-1 mb-1.5">For this site ({hostname})</div>
+            <div className="flex flex-col gap-2">
               {matches.map((r) => <RecordRow key={r.id} record={r} />)}
             </div>
           </div>
@@ -62,7 +65,7 @@ export function VaultScreen({ onAdd }: Props) {
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
         />
 
-        <div className="flex flex-col gap-1 mt-3">
+        <div className="flex flex-col gap-2 mt-3">
           {query.isLoading ? (
             <div className="text-sm text-muted-foreground text-center py-6">Loading…</div>
           ) : records.length === 0 ? (
@@ -84,10 +87,10 @@ export function VaultScreen({ onAdd }: Props) {
       <button
         type="button"
         onClick={onAdd}
-        className="absolute bottom-4 right-4 h-11 w-11 rounded-full bg-primary text-white text-2xl leading-none shadow-lg hover:opacity-90"
+        className="absolute bottom-4 right-4 h-11 w-11 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:opacity-90"
         title="Add record"
       >
-        +
+        <PlusIcon />
       </button>
     </div>
   );
