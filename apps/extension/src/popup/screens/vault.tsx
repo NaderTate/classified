@@ -5,7 +5,7 @@ import { Alert } from "../components/alert";
 import { RecordRow } from "../components/record-row";
 import { useRecords } from "../hooks/use-records";
 import { useCurrentTabHostname } from "../hooks/use-current-tab";
-import { findMatches } from "@/lib/match";
+import { findMatches, searchKeywordForHost } from "@/lib/match";
 import { useAuth } from "../hooks/use-auth";
 import { PlusIcon } from "../components/icons";
 import type { Record } from "@classified/shared";
@@ -19,7 +19,14 @@ export function VaultScreen({ onAdd }: Props) {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [userEditedSearch, setUserEditedSearch] = useState(false);
   const hostname = useCurrentTabHostname();
+
+  useEffect(() => {
+    if (hostname && !userEditedSearch && search === "") {
+      setSearch(searchKeywordForHost(hostname));
+    }
+  }, [hostname, userEditedSearch, search]);
 
   useEffect(() => {
     const id = window.setTimeout(() => setDebouncedSearch(search), 200);
@@ -62,7 +69,11 @@ export function VaultScreen({ onAdd }: Props) {
         <Input
           placeholder="Search..."
           value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          onChange={(e) => {
+            setUserEditedSearch(true);
+            setSearch(e.target.value);
+            setPage(1);
+          }}
         />
 
         <div className="flex flex-col gap-2 mt-3">

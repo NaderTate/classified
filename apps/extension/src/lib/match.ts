@@ -43,6 +43,16 @@ function rankFor(hostNorm: string, siteNorm: string): Rank | null {
   return null;
 }
 
+function registrableDomainOf(hostname: string): string {
+  return registrableDomain(normalizeHostname(hostname));
+}
+
+export function searchKeywordForHost(hostname: string): string {
+  const reg = registrableDomainOf(hostname);
+  const first = reg.split(".")[0];
+  return first ?? reg;
+}
+
 export function findMatches(currentHostname: string, records: Record[]): Record[] {
   const hostNorm = normalizeHostname(currentHostname);
   const scored: Array<{ record: Record; rank: Rank }> = [];
