@@ -37,7 +37,7 @@ export function VaultScreen({ onAdd }: Props) {
 
   const records = (query.data?.records ?? []) as Record[];
   const totalPages = query.data
-    ? Math.max(1, Math.ceil(query.data.totalCount / query.data.limit))
+    ? Math.max(1, Math.ceil(query.data.resultsCount / query.data.limit))
     : 1;
   const matches = useMemo(
     () => (hostname ? findMatches(hostname, records) : []),
